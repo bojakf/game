@@ -65,7 +65,7 @@ public class NetServer {
 					int playerID = Game.net.genPlayerID();
 					
 					out.writeInt(playerID);
-					Game.net.addNetPlayer(new Player(playerID), Game.net.netObjects.size());
+					Game.net.addNetPlayer(new Player(playerID));
 					
 					
 					for(int i = 0; i < Game.net.netObjects.size(); i++) {

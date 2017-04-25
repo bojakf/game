@@ -108,6 +108,7 @@ public class NetClient {
 						 * 
 						 * 
 						 * 
+						 * 
 						 */
 						if(data.size() > 3 && !(Game.net.netObjects.get(id) instanceof Player)) new Exception("Error");
 						Game.net.netObjects.get(id).receiveNetUpdate(data);
