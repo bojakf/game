@@ -36,6 +36,9 @@ public class Map implements Serializable {
 					Game.net.registerNetObject(floor.get(floor.size()-1));
 				} else if ((x == 5 || x == 6) && (y == 5 || y == 6)) {
 					
+				} else if(x == 1 || x == Game.QUADS_X-2 || y == 1 || y == Game.QUADS_Y-2) {
+					floor.add(new MapFloor(new Vector(x, y), "wall"));
+					Game.net.registerNetObject(floor.get(floor.size()-1));
 				} else {
 					floor.add(new MapFloor(new Vector(x, y), "grass"));
 					Game.net.registerNetObject(floor.get(floor.size()-1));

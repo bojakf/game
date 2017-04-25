@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import main.Game;
+import map.Player;
 
 public class NetServer {
 	
@@ -58,17 +59,26 @@ public class NetServer {
 					ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
 					ObjectInputStream in = new ObjectInputStream(client.getInputStream());
 					
-					out.writeInt(Game.net.genPlayerID());
+					/*
+					 * Generate player
+					 */
+					int playerID = Game.net.genPlayerID();
+					
+					out.writeInt(playerID);
+					Game.net.addNetPlayer(new Player(playerID), Game.net.netObjects.size());
+					
 					
 					for(int i = 0; i < Game.net.netObjects.size(); i++) {
 						if(Game.net.netObjects.get(i) instanceof NetPlayer) 
-							out.writeObject(NetCommands.ADD_PLAYER);
+							out.writeByte(NetCommands.ADD_PLAYER);
 						else
 							out.writeByte(NetCommands.ADD_OBJECT);
 						out.writeObject(Game.net.netObjects.get(i));
 					}
 					
-					handles.add(new NetHandle(client, out, in));
+					NetHandle handle = new NetHandle(client, out, in);
+					handle.playerID = playerID;
+					handles.add(handle);
 					
 				
 				} catch (IOException e) {

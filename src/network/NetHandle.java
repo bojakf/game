@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import main.Game;
@@ -19,6 +20,8 @@ public class NetHandle {
 	private Socket client;
 	private ObjectOutputStream out;
 	private ObjectInputStream in;
+	
+	protected int playerID;
 	
 	public NetHandle(Socket client, ObjectOutputStream out, ObjectInputStream in) {
 		this.client = client;
@@ -77,6 +80,8 @@ public class NetHandle {
 					
 				} catch (IOException e) {
 					e.printStackTrace();
+					//FIXME don't handle exception like this
+					if(e instanceof SocketException) break;
 				}
 				
 			}
@@ -102,7 +107,12 @@ public class NetHandle {
 			 * TODO handle player input here
 			 */
 			while(!stop) {
-				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 		}

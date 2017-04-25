@@ -36,9 +36,10 @@ public class Game {
 	
 	public Game() {
 		
-		TexManager.loadTex("grass", "D:\\workspace\\JustAGame\\textures\\grass.jpg");
-		TexManager.loadTex("wall", "D:\\workspace\\JustAGame\\textures\\wall.png");
-		TexManager.loadTex("player", "D:\\workspace\\JustAGame\\textures\\player.gif");
+		//TODO don't use static path
+		TexManager.loadTex("grass", "D:\\workspace\\git\\Game\\textures\\grass.jpg");
+		TexManager.loadTex("wall", "D:\\workspace\\git\\Game\\textures\\wall.png");
+		TexManager.loadTex("player", "D:\\workspace\\git\\Game\\textures\\player.gif");
 		
 		try {
 			new ServerSocket(25565).close();
@@ -94,7 +95,9 @@ public class Game {
 	
 	protected void update(double deltaTime) {
 		
-		net.updateNetObjects(deltaTime); 
+		if(net.isServer()) {
+			net.updateNetObjects(deltaTime); 
+		}
 		
 	}
 	

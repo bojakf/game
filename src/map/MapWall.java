@@ -11,6 +11,8 @@ import static org.lwjgl.opengl.GL11.glVertex2d;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.lwjgl.opengl.GL11;
+
 import loading.TexManager;
 import main.Game;
 import network.NetObject;
@@ -20,10 +22,14 @@ import physics.Vector;
 
 public class MapWall extends Collider implements Serializable, NetObject {
 
+	/*
+	 * FIXME this object does not do what it's supposed to do
+	 */
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3631275564008164860L;
+	private static final long serialVersionUID = 5700843973237153515L;
 	
 	private String tex;
 	
@@ -48,7 +54,7 @@ public class MapWall extends Collider implements Serializable, NetObject {
 		glTranslated(0, 0, -1);
 		
 		glColor3d(1, 1, 1);
-		TexManager.bindTex(tex);
+		TexManager.bindTex("wall");
 		
 		glBegin(GL_QUADS);
 		

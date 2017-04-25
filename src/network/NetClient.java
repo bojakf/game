@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import main.Game;
+import map.Player;
 
 public class NetClient {
 	
@@ -59,15 +60,12 @@ public class NetClient {
 		@Override
 		public void run() {
 			
-			int q = 0;
-			
 			while(!stop) {
 				
 				try {
 					
-					System.out.println(q);
 					byte command = in.readByte();
-					q++;
+					
 					if(command == NetCommands.DISCONNECT) {
 						break;
 					} else if(command == NetCommands.ADD_OBJECT) {
@@ -79,7 +77,6 @@ public class NetClient {
 						
 					} else if(command == NetCommands.UPDATE_OBJECT) {
 						
-						q+= 100000;
 						int id = in.readInt();
 						int size = in.readInt();
 						ArrayList<Object> data = new ArrayList<>();
@@ -88,6 +85,31 @@ public class NetClient {
 							data.add(in.readObject());
 						}
 						
+						/*
+						 * 
+						 * 
+						 * 
+						 * 
+						 * 
+						 * 
+						 * FIXME TODO FIXME TODO
+						 * if the condition of this if statement is true this means that
+						 * the id does not represent the correct object
+						 * 
+						 * 
+						 * 
+						 * 
+						 * 
+						 * 
+						 * 
+						 * 
+						 * 
+						 * 
+						 * 
+						 * 
+						 * 
+						 */
+						if(data.size() > 3 && !(Game.net.netObjects.get(id) instanceof Player)) new Exception("Error");
 						Game.net.netObjects.get(id).receiveNetUpdate(data);
 						
 					}
@@ -122,7 +144,12 @@ public class NetClient {
 			 */
 			
 			while(!stop) {
-				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 		}

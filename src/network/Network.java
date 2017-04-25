@@ -16,6 +16,7 @@ public class Network {
 	 */
 	
 	/*
+	 * FIXME independent input for players
 	 * TODO replace Mouse deprecated methods for server clients
 	 * TODO replace Keyboard deprecated methods for server clients
 	 */
@@ -26,6 +27,14 @@ public class Network {
 	
 	/*
 	 * TODO send new objects during runntime to clients
+	 */
+	
+	/*
+	 * TODO reduce CPU overhead
+	 */
+	
+	/*
+	 * TODO remove player after disconnect
 	 */
 	
 	public static final double SYNC_RATE = 60;
@@ -123,6 +132,7 @@ public class Network {
 	protected void addNetPlayer(NetPlayer obj) {
 		netObjects.add(obj);
 		netPlayers.add(obj);
+		System.out.println(netPlayers.size());
 	}
 	
 	public int genPlayerID() {

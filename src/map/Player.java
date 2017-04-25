@@ -118,7 +118,7 @@ public class Player extends Collider implements NetPlayer {
 	
 	public void render() {
 		
-		glTranslated(0, 0, -0.5d);
+		glTranslated(0, 0, -0.5d * (2-playerID));
 		
 		TexManager.bindTex("player");
 		
@@ -137,7 +137,7 @@ public class Player extends Collider implements NetPlayer {
 		
 		glColor3d(1, 1, 1);
 		
-		glTranslated(pos.x * Game.QUAD_SIZE, pos.y * Game.QUAD_SIZE, 0);
+		glTranslated(pos.x * Game.QUAD_SIZE, pos.y * Game.QUAD_SIZE, 0d);
 		
 		glBegin(GL_QUADS);
 		
@@ -155,8 +155,8 @@ public class Player extends Collider implements NetPlayer {
 		
 		glEnd();
 		
-		glTranslated(-pos.x * Game.QUAD_SIZE, -pos.y * Game.QUAD_SIZE, 0);
-		glTranslated(0, 0, 0.5d);
+		glTranslated(-pos.x * Game.QUAD_SIZE, -pos.y * Game.QUAD_SIZE, 0d);
+		glTranslated(0, 0, 0.5d * (2-playerID));
 		
 	}
 
