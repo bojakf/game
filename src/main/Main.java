@@ -88,6 +88,9 @@ public class Main {
 		Keyboard.destroy();
 		destroy();
 		
+		//Ensure that all threads are closed
+		System.exit(0);
+		
 	}
 	
 	private void initWindow() {

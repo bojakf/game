@@ -2,8 +2,6 @@ package map;
 
 import org.lwjgl.glfw.GLFW;
 
-import debug.Debug;
-
 import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
@@ -12,11 +10,10 @@ import input.Keyboard;
 import input.Keyboard.CharListener;
 import input.Keyboard.KeyListener;
 import input.Mouse;
-import input.MouseListener;
-import input.MouseMotionListener;
+import input.Mouse.MouseListener;
+import input.Mouse.MouseMotionListener;
 import loading.TexManager;
 import main.Game;
-import main.Main;
 import network.NetPlayer;
 import physics.Collider;
 import physics.Physics;
@@ -65,24 +62,24 @@ public class Player extends Collider implements NetPlayer {
 					laserOn = true;					
 				}
 			}
-		});
+		}, playerID);
 		
 	}
 	
 	public void update(double deltaTime) {
 		
-		if(Keyboard.isKeyDown(GLFW.GLFW_KEY_W)) {
-			velocity.y = 2;
-		} else if(Keyboard.isKeyDown(GLFW.GLFW_KEY_S)) {
-			velocity.y = -2;
+		if(Keyboard.isKeyDown(GLFW.GLFW_KEY_W, playerID)) {
+			velocity.y = PLAYER_SPEED;
+		} else if(Keyboard.isKeyDown(GLFW.GLFW_KEY_S, playerID)) {
+			velocity.y = -PLAYER_SPEED;
 		} else {
 			velocity.y = 0;
 		}		
 		
-		if(Keyboard.isKeyDown(GLFW.GLFW_KEY_D)) {
-			velocity.x = 2;
-		} else if(Keyboard.isKeyDown(GLFW.GLFW_KEY_A)) {
-			velocity.x = -2;
+		if(Keyboard.isKeyDown(GLFW.GLFW_KEY_D, playerID)) {
+			velocity.x = PLAYER_SPEED;
+		} else if(Keyboard.isKeyDown(GLFW.GLFW_KEY_A, playerID)) {
+			velocity.x = -PLAYER_SPEED;
 		} else {
 			velocity.x = 0;
 		}
@@ -91,12 +88,13 @@ public class Player extends Collider implements NetPlayer {
 			
 			Vector dir = new Vector();
 			Vector origin = new Vector();
+			Vector mp = Mouse.xy(playerID);
 			
-			origin.x = Player.this.pos.x + Player.this.size.x/2;
-			origin.y = Player.this.pos.y + Player.this.size.y/2;
+			origin.x = pos.x + size.x/2;
+			origin.y = pos.y + size.y/2;
 			
-			dir.x = -(Mouse.x() / Game.QUAD_SIZE - origin.x);
-			dir.y = -(Mouse.y() / Game.QUAD_SIZE - origin.y);
+			dir.x = -(mp.x / Game.QUAD_SIZE - origin.x);
+			dir.y = -(mp.y / Game.QUAD_SIZE - origin.y);
 			dir.normalize();
 			
 			RaycastHit hit = Physics.raycast(new Ray(origin, dir), Physics.LAYER_PLAYER);
@@ -111,6 +109,8 @@ public class Player extends Collider implements NetPlayer {
 				dir.add(origin);
 				laserEnd = dir;
 			}
+			
+			if(playerID != 0)System.out.println();
 			
 		}
 		

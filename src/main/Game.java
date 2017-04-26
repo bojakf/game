@@ -1,22 +1,15 @@
 package main;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-
-import org.lwjgl.opengl.GL11;
 
 import debug.Debug;
 import loading.TexManager;
 import map.Map;
-import map.MapFloor;
 import map.Player;
 import network.Network;
-import physics.Collider;
 import physics.Physics;
-import physics.Vector;
 
 public class Game {
 
@@ -25,6 +18,15 @@ public class Game {
 	 */
 	/*
 	 * TODO add option to disable vsync
+	 */
+	/*
+	 * TODO log files
+	 */
+	/*
+	 * TODO change network input handling (client has to use server key bindings)
+	 */
+	/*
+	 * TODO add taskbar icon
 	 */
 	
 	public static final double QUADS_Y = 15d;
@@ -84,7 +86,7 @@ public class Game {
 					}				
 					
 				}
-			});
+			}, "Physics");
 			physicsThread.start();
 			
 			map = new Map();
@@ -98,7 +100,6 @@ public class Game {
 	protected void update(double deltaTime) {
 		
 		if(net.isServer()) {
-			System.out.println(1/deltaTime);
 			net.updateNetObjects(deltaTime); 
 		}
 		

@@ -2,7 +2,7 @@ package physics;
 
 import java.io.Serializable;
 
-public class Vector implements Serializable {
+public class Vector implements Serializable, Cloneable {
 
 	/**
 	 * 
@@ -55,6 +55,11 @@ public class Vector implements Serializable {
 	@Override
 	public String toString() {
 		return "x: " + x + "      y: " + y;
+	}
+	
+	@Override
+	public Vector clone() {
+		return new Vector(x, y);
 	}
 	
 }

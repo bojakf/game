@@ -2,8 +2,11 @@ package network;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import main.Game;
 import map.Player;
+import physics.Vector;
 
 public class Network {
 
@@ -16,9 +19,7 @@ public class Network {
 	 */
 	
 	/*
-	 * FIXME independent input for players
 	 * TODO replace Mouse deprecated methods for server clients
-	 * TODO replace Keyboard deprecated methods for server clients
 	 */
 	
 	/*
@@ -66,6 +67,8 @@ public class Network {
 		Network r = new Network(client.getPlayerID());
 		r.client = client;
 		r.server = null;
+		Game.net = r;
+		client.init();
 		return r;
 	}
 	
@@ -132,7 +135,36 @@ public class Network {
 	protected void addNetPlayer(NetPlayer obj) {
 		netObjects.add(obj);
 		netPlayers.add(obj);
-		System.out.println(netPlayers.size());
+	}
+	
+	public HashMap<Integer, Integer> getKeyStates(int playerID) {
+		if(playerID == this.playerID) {
+			new Exception("Use input.Keyboard for local key polling").printStackTrace();
+			return null;
+		}
+		for(int i = 0; i < server.handles.size(); i++) {
+			NetHandle n = server.handles.get(i);
+			if(n.playerID == playerID) {
+				return n.keyStates;
+			}
+		}
+		new Exception("No input found for player " + playerID).printStackTrace();
+		return null;
+	}
+	
+	public Vector getMousePosition(int playerID) {
+		if(playerID == this.playerID) {
+			new Exception("Use input.Mouse for local mouse position").printStackTrace();
+			return null;
+		}
+		for(int i = 0; i < server.handles.size(); i++) {
+			NetHandle n = server.handles.get(i);
+			if(n.playerID == playerID) {
+				return n.mousePos;
+			}
+		}
+		new Exception("No mouse pos found for player " + playerID).printStackTrace();
+		return null;
 	}
 	
 	public int genPlayerID() {

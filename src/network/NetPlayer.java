@@ -1,9 +1,9 @@
 package network;
 
-import input.MouseListener;
-import input.MouseMotionListener;
 import input.Keyboard.CharListener;
 import input.Keyboard.KeyListener;
+import input.Mouse.MouseListener;
+import input.Mouse.MouseMotionListener;
 
 public interface NetPlayer extends NetObject {
 	

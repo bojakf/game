@@ -15,7 +15,8 @@ public class NetServer {
 	private Thread acceptThread;
 	private ServerSocket serverSocket;
 	private boolean stop = false;
-	private ArrayList<NetHandle> handles;
+	
+	protected ArrayList<NetHandle> handles;
 	
 	protected NetServer(int port) {
 		
@@ -27,7 +28,7 @@ public class NetServer {
 			e.printStackTrace();
 			return;
 		}
-		acceptThread = new Thread(acceptRunnable);
+		acceptThread = new Thread(acceptRunnable, "Server");
 		acceptThread.start();
 		
 	}
