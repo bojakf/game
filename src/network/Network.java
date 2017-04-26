@@ -30,14 +30,11 @@ public class Network {
 	 */
 	
 	/*
-	 * TODO reduce CPU overhead
+	 * ((TODO reduce CPU overhead))
 	 */
 	
 	/*
 	 * TODO remove player after disconnect
-	 */
-	/*
-	 * TODO improve network update rate
 	 */
 	
 	public static final double SYNC_RATE = 60;

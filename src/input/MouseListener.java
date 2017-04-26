@@ -1,5 +1,5 @@
 package input;
-
+@Deprecated
 public abstract class MouseListener {
 	
 	public abstract void onPress(int button, int modifiers);

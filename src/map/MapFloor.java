@@ -76,16 +76,18 @@ public class MapFloor implements Serializable, NetObject {
 
 	@Override
 	public void sendNetUpdate(ArrayList<Object> data) {
-		data.add(pos);
-		data.add(size);
-		data.add(tex);
+		//FIXME don't do this
+//		data.add(pos);
+//		data.add(size);
+//		data.add(tex);
 	}
 
 	@Override
 	public void receiveNetUpdate(ArrayList<Object> data) {
-		pos = (Vector) data.get(0);
-		size = (Vector) data.get(1);
-		tex = (String) data.get(2);
+		//FIXME don't do this
+//		pos = (Vector) data.get(0);
+//		size = (Vector) data.get(1);
+//		tex = (String) data.get(2);
 	}
 
 }

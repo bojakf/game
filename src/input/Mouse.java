@@ -187,19 +187,19 @@ public class Mouse {
 	public enum CursorMode {
 		disabled, hidden, normal
 	}
-	
+	@Deprecated
 	public static void addMouseMotionListener(MouseMotionListener mm) {
 		mouseMotionListeners.add(mm);
 	}
-	
+	@Deprecated
 	public static void addMouseButtonListener(MouseListener mb) {
 		mouseButtonListeners.add(mb);
 	}
-	
+	@Deprecated
 	public static void removeMouseMotionListener(MouseMotionListener mm) {
 		mouseMotionListeners.remove(mm);
 	}
-	
+	@Deprecated
 	public static void removeMouseButtonListener(MouseListener mb) {
 		mouseButtonListeners.remove(mb);
 	}

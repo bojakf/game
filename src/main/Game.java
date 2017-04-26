@@ -21,8 +21,10 @@ import physics.Vector;
 public class Game {
 
 	/*
-	 * TODO handle rendering completely in Network
 	 * TODO create Physics Thread in Network
+	 */
+	/*
+	 * TODO add option to disable vsync
 	 */
 	
 	public static final double QUADS_Y = 15d;
@@ -96,6 +98,7 @@ public class Game {
 	protected void update(double deltaTime) {
 		
 		if(net.isServer()) {
+			System.out.println(1/deltaTime);
 			net.updateNetObjects(deltaTime); 
 		}
 		

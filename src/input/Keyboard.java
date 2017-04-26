@@ -112,28 +112,34 @@ public class Keyboard {
 		
 	}
 	
+	@Deprecated
 	public static void addKeyListener(KeyListener kl) {
 		keyListeners.add(kl);
 	}
 	
+	@Deprecated
 	public static void addCharListener(CharListener cl) {
 		charListeners.add(cl);
 	}
 	
+	@Deprecated
 	public static boolean removeKeyListener(KeyListener kl) {
 		return keyListeners.remove(kl);
 	}
 	
+	@Deprecated
 	public static boolean removeCharListener(CharListener cl) {
 		return charListeners.remove(cl);
 	}
 	
+	@Deprecated
 	public static abstract class KeyListener {
 		public abstract void onKeyDown(int keycode, int modifiers);
 		public abstract void onKeyRepeat(int keycode, int modifiers);
 		public abstract void onKeyUp(int keycode, int modifiers);
 	}
 	
+	@Deprecated
 	public static abstract class CharListener {
 		public abstract void onChar(char input);
 	}

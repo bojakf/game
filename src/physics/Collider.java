@@ -13,6 +13,10 @@ public abstract class Collider implements Serializable {
 	 */
 	private static final long serialVersionUID = -677833801751417709L;
 
+	/*
+	 * TODO final colliders
+	 */
+	
 	private boolean pendingDestroy = false;
 	
 	protected Vector pos;
