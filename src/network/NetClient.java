@@ -85,32 +85,6 @@ public class NetClient {
 							data.add(in.readObject());
 						}
 						
-						/*
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 * FIXME TODO FIXME TODO
-						 * if the condition of this if statement is true this means that
-						 * the id does not represent the correct object
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 * 
-						 */
-						if(data.size() > 3 && !(Game.net.netObjects.get(id) instanceof Player)) new Exception("Error");
 						Game.net.netObjects.get(id).receiveNetUpdate(data);
 						
 					}

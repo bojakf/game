@@ -8,7 +8,9 @@ import java.net.SocketException;
 import java.util.ArrayList;
 
 import main.Game;
+import map.Player;
 import physics.Physics;
+import physics.Vector;
 
 public class NetHandle {
 	
@@ -77,6 +79,12 @@ public class NetHandle {
 						}
 						
 					}
+					
+					/*
+					 * Reset output stream in order to prevent
+					 * referencing already sent objects
+					 */
+					out.reset();
 					
 				} catch (IOException e) {
 					e.printStackTrace();

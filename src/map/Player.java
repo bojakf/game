@@ -122,7 +122,7 @@ public class Player extends Collider implements NetPlayer {
 		
 		TexManager.bindTex("player");
 		
-		if(laserOn) {
+		if(laserOn && laserStart != null && laserEnd != null) {
 			
 			glColor3d(1, 1, 0);
 			

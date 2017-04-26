@@ -36,6 +36,9 @@ public class Network {
 	/*
 	 * TODO remove player after disconnect
 	 */
+	/*
+	 * TODO improve network update rate
+	 */
 	
 	public static final double SYNC_RATE = 60;
 	
