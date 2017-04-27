@@ -11,6 +11,13 @@ import static org.lwjgl.opengl.GL11.*;
 
 import physics.Vector;
 
+/**
+ * 
+ * Class for the floor of the map
+ * 
+ * @author jafi2
+ *
+ */
 public class MapFloor implements Serializable, NetObject {
 
 	/**
@@ -21,19 +28,45 @@ public class MapFloor implements Serializable, NetObject {
 	/*
 	 * TODO use this everywhere
 	 */
+	/**
+	 * unused
+	 */
 	private final boolean finalPos = false;
+	/**
+	 * unused
+	 */
 	private final boolean finalSize = false;
+	/**
+	 * unused
+	 */
 	private final boolean finalTex = false;
 	
+	/**
+	 * position and size of floor
+	 */
 	private Vector pos, size;
+	/**
+	 * name of floor texture
+	 */
 	private String tex;
 	
+	/**
+	 * Create floor with size of 1, 1
+	 * @param pos the position of the floor
+	 * @param tex the texture of the floor
+	 */
 	public MapFloor(Vector pos, String tex) {
 		this.pos = pos;
 		this.size = new Vector(1, 1);
 		this.tex = tex;
 	}
 	
+	/**
+	 * Create floor
+	 * @param pos the position of the floor
+	 * @param size the size of the floor
+	 * @param tex the texture of the floor
+	 */
 	public MapFloor(Vector pos, Vector size, String tex) {
 		this.pos = pos;
 		this.size = size;
@@ -42,7 +75,6 @@ public class MapFloor implements Serializable, NetObject {
 	
 	@Override
 	public void update(double deltaTime) {
-		// TODO Auto-generated method stub
 		
 	}
 	
@@ -75,7 +107,7 @@ public class MapFloor implements Serializable, NetObject {
 	}
 
 	@Override
-	public void sendNetUpdate(ArrayList<Object> data) {
+	public void sendNetUpdate(ArrayList<Serializable> data) {
 		//FIXME don't do this
 //		data.add(pos);
 //		data.add(size);
@@ -83,7 +115,7 @@ public class MapFloor implements Serializable, NetObject {
 	}
 
 	@Override
-	public void receiveNetUpdate(ArrayList<Object> data) {
+	public void receiveNetUpdate(ArrayList<Serializable> data) {
 		//FIXME don't do this
 //		pos = (Vector) data.get(0);
 //		size = (Vector) data.get(1);

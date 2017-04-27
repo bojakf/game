@@ -7,8 +7,20 @@ import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
 
+/**
+ * 
+ * Loads textures
+ * 
+ * @author jafi2
+ *
+ */
 class TextureLoader {
 	
+	/**
+	 * Load a texture form a given path
+	 * @param path the location of the texture file
+	 * @return the texture object
+	 */
 	public static Texture load(String path) {
 		
 		IntBuffer w = BufferUtils.createIntBuffer(1);
@@ -20,7 +32,7 @@ class TextureLoader {
 			throw new RuntimeException("Faild to load texture " + path + ":" + System.lineSeparator() + stbi_failure_reason());
 		}
 		
-		return new Texture(w.get(), h.get(), image, true);
+		return new Texture(w.get(), h.get(), image, false);
 		
 	}
 	

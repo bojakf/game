@@ -9,16 +9,34 @@ import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.ARBVertexShader;
 import org.lwjgl.opengl.GL11;
 
+/**
+ * 
+ * Used to upload a shader from file to GPU
+ * <br>
+ * To change the used shader use ARBShaderObjects.glUseProgramObjectARB(id of the shader);
+ * 
+ * @author jafi2
+ *
+ */
 public class ShaderLoader {
 	
-	private static int program = 0;
-	private static int vertexShader = 0, fragmentShader = 0;
+	/**
+	 * this class contains only static methods
+	 */
+	private ShaderLoader() {}
 	
+	/**
+	 * Uploads a shader to the gpu
+	 * and prints shader debug information
+	 * @param vertexShaderName the location of the vertex shader
+	 * @param fragmentShaderName the location of the fragment shader
+	 * @return the id of the shader object
+	 */
 	public static int loadShader(String vertexShaderName, String fragmentShaderName) {
 		
-		program = 0;
-		vertexShader = 0;
-		fragmentShader = 0;
+		int program = 0;
+		int vertexShader = 0;
+		int fragmentShader = 0;
 		
 		try {
 			vertexShader = createShader(vertexShaderName, ARBVertexShader.GL_VERTEX_SHADER_ARB);
@@ -49,6 +67,13 @@ public class ShaderLoader {
 		return program;
 	}
 	
+	/**
+	 * Creates a shader of the specified type
+	 * @param filename the location of the shader file
+	 * @param shaderType the type of the shader
+	 * @return the id of the shader
+	 * @throws Exception thrown exceptions during shader creation
+	 */
 	private static int createShader(String filename, int shaderType) throws Exception {
 		
 		int shader = 0;
@@ -78,15 +103,26 @@ public class ShaderLoader {
 		
 	}
 	
+	/**
+	 * get the log info from a shader
+	 * @param obj the shader id
+	 * @return the log info
+	 */
 	private static String getLogInfo(int obj) {
 		return ARBShaderObjects.glGetInfoLogARB(obj, ARBShaderObjects.glGetObjectParameteriARB(obj, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB));
 	}
 	
+	/**
+	 * Reads a shader file in as string
+	 * @param filename the location of the file
+	 * @return the text read from the file
+	 * @throws Exception exceptions thrown during loading
+	 */
 	private static String readFileAsString(String filename) throws Exception {
 		
 		StringBuilder source = new StringBuilder();
 		
-		FileInputStream in = new FileInputStream("D:\\workspace\\SpaceshipShooter\\src\\" + filename);
+		FileInputStream in = new FileInputStream(filename);
 		
 		Exception e = null;
 		BufferedReader reader;

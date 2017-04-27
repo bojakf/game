@@ -11,6 +11,15 @@ import map.Player;
 import network.Network;
 import physics.Physics;
 
+/**
+ * 
+ * This is the Main Class for the game
+ * all actual game Logic starts here
+ * 
+ * @author jafi2
+ *
+ */
+
 public class Game {
 
 	/*
@@ -28,16 +37,55 @@ public class Game {
 	/*
 	 * TODO add taskbar icon
 	 */
+	/*
+	 * TODO add main Menu
+	 */
+	/*
+	 * TODO add map creator level
+	 */
+	/*
+	 * TODO server gather net object information only once and send to all clients
+	 */
+	/*
+	 * TODO maybe add option to use multicast to send server updates to the clients
+	 */
+	/*
+	 * TODO use a default texture for the floor and not many objects. Set the size at which the texture should be repeated
+	 */
+	/*
+	 * TODO mipmaping
+	 */
+	/*
+	 * TODO texture packs
+	 */
 	
+	/**
+	 * Number of quads fitting in y-Direction on screen
+	 */
 	public static final double QUADS_Y = 15d;
+	/**
+	 * Size of one Quad
+	 */
 	public static final double QUAD_SIZE = Main.windowHeight/QUADS_Y;
+	/**
+	 * Number of quads fitting in x-Direction on screen
+	 */
 	public static final double QUADS_X = Main.windowWidth/QUAD_SIZE;
 	
+	/**
+	 * the current Network Object
+	 */
 	public static Network net;
 	
-	private Map map;
+	/**
+	 * The Thread calculating physics
+	 */
 	private Thread physicsThread;
 	
+	/**
+	 * Create the game
+	 * There may be only one instance of this class
+	 */
 	public Game() {
 		
 		//TODO don't use static path
@@ -89,7 +137,7 @@ public class Game {
 			}, "Physics");
 			physicsThread.start();
 			
-			map = new Map();
+			new Map();
 			
 			net.registerNetPlayer(new Player(0));
 		
@@ -97,14 +145,23 @@ public class Game {
 		
 	}
 	
+	/**
+	 * Update the Game<br>
+	 * called by Main<br>
+	 * all updates should be done in here
+	 * @param deltaTime time since the last update
+	 */
 	protected void update(double deltaTime) {
-		
 		if(net.isServer()) {
 			net.updateNetObjects(deltaTime); 
 		}
-		
 	}
 	
+	/**
+	 * Render the game<br>
+	 * called by Main<br>
+	 * all rendering must be done in here
+	 */
 	protected void render() {
 		
 		net.renderNetObjects();
@@ -115,6 +172,9 @@ public class Game {
 		
 	}
 	
+	/**
+	 * called when the mainLoop ended
+	 */
 	protected void onClose() {
 		net.close();
 	}

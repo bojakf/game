@@ -16,19 +16,47 @@ public abstract class Collider implements Serializable {
 	/*
 	 * TODO final colliders
 	 */
+	/*
+	 * TODO add bounciness to collider
+	 */
 	
+	/**
+	 * Did the physics thread remove the collider
+	 */
 	private boolean pendingDestroy = false;
 	
+	/**
+	 * position of the collider
+	 */
 	protected Vector pos;
+	/**
+	 * size of the collider
+	 */
 	protected Vector size;
 	protected Vector velocity;
 	protected int layer;
 	
 	public boolean sendCollision = true;
 	public boolean reveiveCollision = true;
+	/**
+	 * Can other objects pass through the collider<br>
+	 * if on one of the colliders has isBlocking == false the colliders can pass through each other.<br>
+	 * onCollision will still be called
+	 */
 	public boolean isBlocking = false;
+	/**
+	 * can the collider be moved
+	 * TODO replace this with endless mass after implementing force into physics
+	 */
 	public boolean isStatic = false;
 	
+	/**
+	 * Create the collider, and add it to physics
+	 * @param pos the initial position of the Collider
+	 * @param size the initial size of the Collider
+	 * @param velocity the initial velocity of the Collider
+	 * @param layer the initial layer of the Collider
+	 */
 	public Collider(Vector pos, Vector size, Vector velocity, int layer) {
 		
 		if(size.x < 0
@@ -59,11 +87,18 @@ public abstract class Collider implements Serializable {
 		
 	}
 	
+	/**
+	 * called once every pyhsicsUpdate
+	 * @param deltaTime time since the last update
+	 */
 	protected final void physicsUpdate(double deltaTime) {
 		pos.x += velocity.x * deltaTime;
 		pos.y += velocity.y * deltaTime;
 	}
 	
+	/**
+	 * draw the collider wireframe
+	 */
 	public final void draw() {
 		
 		glLineWidth(4f);
@@ -87,26 +122,25 @@ public abstract class Collider implements Serializable {
 		
 	}
 	
+	/**
+	 * destroy the collider
+	 */
 	public final void destroy() {
 		pendingDestroy = true;
 	}
 	
+	/**
+	 * is the collider queued for deletion 
+	 * @return pendingDestroy
+	 */
 	public final boolean isPendingDestroy() {
 		return pendingDestroy;
 	}
 	
-	public final Vector getPos() {
-		return pos;
-	}
-
-	public final Vector getSize() {
-		return size;
-	}
-
-	public final Vector getVelocity() {
-		return velocity;
-	}
-
+	/**
+	 * get the current physical layer of the object
+	 * @return physical layer
+	 */
 	public final int getLayer() {
 		return layer;
 	}
@@ -119,8 +153,10 @@ public abstract class Collider implements Serializable {
 	 * @param hit object hit
 	 */
 	public abstract void onCollision(Collider hit);
+	
+	/**
+	 * Called by physics thread when the collider gets removed
+	 */
 	protected abstract void onDestroy();
-	@Deprecated
-	public abstract Object[] getHitInfo();
 	
 }

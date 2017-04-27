@@ -1,19 +1,18 @@
 package map;
 
-import static org.lwjgl.opengl.GL11.*;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import loading.TexManager;
-
-import static main.Game.QUAD_SIZE;
-
 import main.Game;
-import physics.Collider;
-import physics.Physics;
 import physics.Vector;
 
+/**
+ * 
+ * Does not do anything else then creating the map
+ * 
+ * @author jafi2
+ *
+ */
 public class Map implements Serializable {
 	
 	/**
@@ -21,15 +20,24 @@ public class Map implements Serializable {
 	 */
 	private static final long serialVersionUID = -3678985439336866532L;
 
+	/**
+	 * The floor
+	 */
 	private ArrayList<MapFloor> floor;
+	/**
+	 * the wals
+	 */
 	private ArrayList<MapWall> walls;
 	
+	/**
+	 * Create the map
+	 */
 	public Map() {
 		
 		floor = new ArrayList<>();
 		walls = new ArrayList<>();
 		
-		for(int x = 0; x < Game.QUADS_X; x++) {
+		for(int x = 0; x < Game.QUADS_X-1; x++) {
 			for(int y = 0; y < Game.QUADS_Y; y++) {
 				if(x == 5 && y == 5) {
 					floor.add(new MapFloor(new Vector(x, y), new Vector(2, 2), "grass"));
@@ -45,45 +53,12 @@ public class Map implements Serializable {
 		
 		for(int x = 0; x < Game.QUADS_X; x++) {
 			for(int y = 0; y < Game.QUADS_Y; y++) {
-				if(x == 0 || x == Game.QUADS_X-1 || y == 0 || y == Game.QUADS_Y-1) {
+				if(x == 0 || x == Math.floor(Game.QUADS_X) || y == 0 || y == Game.QUADS_Y-1) {
 					walls.add(new MapWall(new Vector(x, y), "wall"));
 					Game.net.registerNetObject(walls.get(walls.size()-1));
 				}
 			}
 		}
-		
-	}
-	
-	public void update(double deltaTime) {
-		
-	}
-	
-	public void render() {
-	
-		TexManager.bindTex("grass");
-		
-		glColor3d(1, 1, 1);
-		glBegin(GL_QUADS);
-		
-		for(int x = 0; x < Game.QUADS_X; x++) {
-			for(int y = 0; y < Game.QUADS_Y; y++) {
-				
-				glTexCoord2d(0, 0);
-				glVertex2d(x * QUAD_SIZE, (y+1) * QUAD_SIZE);
-				
-				glTexCoord2d(1, 0);
-				glVertex2d((x+1) * QUAD_SIZE, (y+1) * QUAD_SIZE);
-				
-				glTexCoord2d(1, 1);
-				glVertex2d((x+1) * QUAD_SIZE, y * QUAD_SIZE);
-				
-				glTexCoord2d(0, 1);
-				glVertex2d(x * QUAD_SIZE, y * QUAD_SIZE);
-				
-			}
-		}
-		
-		glEnd();
 		
 	}
 	

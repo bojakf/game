@@ -1,5 +1,12 @@
 package utility;
 
+/**
+ * 
+ * Class for additional Math implementations
+ * 
+ * @author jafi2
+ *
+ */
 public class Mathd {
 
 	/**
@@ -7,12 +14,11 @@ public class Mathd {
 	 * get the rotation Matrix for the angles
 	 * angles in degree
 	 * 
-	 * @param rotX
-	 * @param rotY
-	 * @param rotZ
-	 * @return
+	 * @param rotX the x rotation
+	 * @param rotY the y rotation
+	 * @param rotZ the z rotation
+	 * @return the rotation matrix
 	 */
-	
 	public static double[][] getRotationMatrix(double rotX, double rotY, double rotZ) {
 		
 		rotX = Math.toRadians(rotX);
@@ -44,8 +50,8 @@ public class Mathd {
 	/**
 	 * Clamp angle between 0 and 360
 	 * (without changing it's actual direction)
-	 * @param angel
-	 * @return
+	 * @param angle the angle to clamp
+	 * @return the clamped angle
 	 */
 	public static double clampAngle(double angle) {
 		while(angle < 0) {
@@ -61,9 +67,9 @@ public class Mathd {
 	 * 
 	 * Multiply matrixes
 	 * 
-	 * @param A
-	 * @param B
-	 * @return
+	 * @param A the left hand side matrix
+	 * @param B the right hand side matrix
+	 * @return the multiplication of the matrixes
 	 */
 	
 	public static double[][] matMul(double[][] A, double[][] B) {
@@ -95,6 +101,14 @@ public class Mathd {
         return C;
     }
 	
+	/**
+	 * Clamp a value between two others<br>
+	 * <b>Warning: </b> does not work if min is bigger then max
+	 * @param v the value to be clamped
+	 * @param min the minimum value
+	 * @param max the maximum value
+	 * @return the clamped value
+	 */
 	public static double clamp(double v, double min, double max) {
 		
 		if(v < min) {
@@ -107,25 +121,43 @@ public class Mathd {
 		
 	}
 	
+	/**
+	 * The number will be rounded. The number will always get closer to the target
+	 * @param v the value
+	 * @param target the target value
+	 * @return the rounded value
+	 */
 	public static double roundTo(double v, long target) {
 		if(v < target) return Math.ceil(v);
 		if(v > target) return Math.floor(v);
 		return v;
 	}
 	
+	/**
+	 * Returns a random number between min and max
+	 * @param min the minimum number
+	 * @param max the maximum number
+	 * @return the number generated
+	 */
 	public static double randomRange(double min, double max) {
 		return min+(max-min)*Math.random();
 	}
 	
-	public static int ggt(int zahl1, int zahl2) {
-		while (zahl2 != 0) {
-		   if (zahl1 > zahl2) {
-			   zahl1 = zahl1 - zahl2;
+	/**
+	 * Calculates the greatest common divisor
+	 * @param num1 the first number
+	 * @param num2 the second number
+	 * @return the greatest common divisor
+	 */
+	public static int gcd(int num1, int num2) {
+		while (num2 != 0) {
+		   if (num1 > num2) {
+			   num1 = num1 - num2;
 		   } else {
-			   zahl2 = zahl2 - zahl1;
+			   num2 = num2 - num1;
 		   }
 		}
-		return zahl1;
+		return num1;
 	}
 	
 }

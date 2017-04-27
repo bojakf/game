@@ -7,10 +7,23 @@ import java.util.ArrayList;
 import main.Game;
 import physics.Vector;
 
+/**
+ * 
+ * Used for debugging
+ * 
+ * @author jafi2
+ *
+ */
 public class Debug {
-
+	
+	/**
+	 * lines to render in renderDebug()
+	 */
 	public static ArrayList<Vector> lines = new ArrayList<>();
 	
+	/**
+	 * Called when debug should be rendered (mainly in main.Game.render())
+	 */
 	public static void renderDebug() {
 		
 		glTranslated(0, 0, -10);
@@ -33,6 +46,11 @@ public class Debug {
 		
 	}
 	
+	/**
+	 * Adds line to draw
+	 * @param start start of the line
+	 * @param end end of the line
+	 */
 	public static void drawLine(Vector start, Vector end) {
 		lines.add(start);
 		lines.add(end);

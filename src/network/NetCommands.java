@@ -1,5 +1,12 @@
 package network;
 
+/**
+ * 
+ * Contains command sent during networking
+ * 
+ * @author jafi2
+ *
+ */
 public class NetCommands {
 
 	/*

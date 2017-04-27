@@ -1,19 +1,18 @@
 package network;
 
-import input.Keyboard.CharListener;
-import input.Keyboard.KeyListener;
-import input.Mouse.MouseListener;
-import input.Mouse.MouseMotionListener;
-
+/**
+ * 
+ * this is the interface which must be implemented by all objects representing a player
+ * 
+ * @author jafi2
+ *
+ */
 public interface NetPlayer extends NetObject {
 	
-	/*
-	 * For server
+	/**
+	 * Get the id of the player
+	 * @return the id of the player
 	 */
-	public KeyListener getKeyListener();
-	public CharListener getCharListener();
-	public MouseListener getMouseListener();
-	public MouseMotionListener getMouseMotionListener();
 	public int getPlayerID();
 	
 }

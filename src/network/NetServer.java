@@ -10,14 +10,37 @@ import java.util.ArrayList;
 import main.Game;
 import map.Player;
 
+/**
+ * 
+ * This class is used to create a server and send informations to clients
+ * 
+ * @author jafi2
+ *
+ */
 public class NetServer {
 	
+	/**
+	 * Thread for accepting Clients
+	 */
 	private Thread acceptThread;
+	/**
+	 * Socket of server
+	 */
 	private ServerSocket serverSocket;
+	/**
+	 * True if the server is stopping or has already stopped
+	 */
 	private boolean stop = false;
 	
+	/**
+	 * All handels for clients
+	 */
 	protected ArrayList<NetHandle> handles;
 	
+	/**
+	 * Create the server
+	 * @param port the port of the server
+	 */
 	protected NetServer(int port) {
 		
 		handles = new ArrayList<>();
@@ -33,6 +56,9 @@ public class NetServer {
 		
 	}
 	
+	/**
+	 * Close the server
+	 */
 	public void close() {
 		stop = true;
 		for(int i = 0; i < handles.size(); i++) {
@@ -46,6 +72,9 @@ public class NetServer {
 		super.finalize();
 	}
 	
+	/**
+	 * Runnable for accepting new clients
+	 */
 	private Runnable acceptRunnable = new Runnable() {
 		
 		@Override

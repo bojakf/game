@@ -53,32 +53,73 @@ import input.Keyboard;
 import input.Mouse;
 import loading.TexManager;
 
+/**
+ * 
+ * Contains main entry point of the program<br>
+ * Also manages OpenGL initialization
+ * Contains the main loop
+ * 
+ * @author jafi2
+ *
+ */
 public class Main {
-
+	
+	/**
+	 * The openGL id of the current window
+	 */
 	private static long window;
 	
+	/**
+	 * The name of the window
+	 */
 	public static final String name = "Game";
+	/**
+	 * The width and height of the window
+	 */
 	public static final int windowWidth = 1088, windowHeight = 612;
+	/**
+	 * zNear for rendering
+	 */
 	public static final double zNEAR = 10;
+	/**
+	 * zFar for rendering
+	 */
 	public static final double zFAR = -10;
 	
+	/**
+	 * true if the window is closing
+	 */
 	public static boolean isClosing = false;
 	
+	/**
+	 * This is a reference to glCapabilities
+	 * <b>Warning: </b>this reference must not be deleted by the garbage collector before the application is closed. 
+	 * It contains necessary information in native code. OpenGL will not work without it.
+	 */
 	@SuppressWarnings("unused")
 	private static GLCapabilities glCapabilities;
+	/**
+	 * The actual game
+	 */
 	private Game game;
 	
+	/**
+	 * The main of the Game
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		new Main();
 	}
 	
+	/**
+	 * The contructor of main everything is called from here
+	 */
 	public Main() {
 		
 		initWindow();
 		initGL();
 		Mouse.init(window);
 		Keyboard.init(window);
-		TexManager.init();
 		
 		mainLoop();
 		
@@ -93,6 +134,9 @@ public class Main {
 		
 	}
 	
+	/**
+	 * Init the OpenGL window
+	 */
 	private void initWindow() {
 		
 		GLFWErrorCallback.createPrint(System.err).set();
@@ -144,6 +188,9 @@ public class Main {
 		
 	}
 	
+	/**
+	 * Init OpenGL
+	 */
 	private void initGL() {
 		
 		// This line is critical for LWJGL's interoperation with GLFW's
@@ -189,6 +236,13 @@ public class Main {
 		
 	}
 	
+	/**
+	 * set the transformation matrix for 3d perspective rendering
+	 * @param fov Field of View
+	 * @param aspect aspect ratio of the screen ((double)windowWidth/windowHeigt)
+	 * @param zNear start of the rendered area
+	 * @param zFar end of the rendered area
+	 */
 	public static void glPerspective (double fov, double aspect, double zNear, double zFar) {
 		
 		double fH = Math.tan(fov/360*Math.PI) * zNear;
@@ -197,6 +251,10 @@ public class Main {
 		
 	}
 	
+	/**
+	 * Calls all game methods in main Thread.<br>
+	 * Also calculates deltaTimes polls Input events and prepares rendering
+	 */
 	private void mainLoop() {
 		
 		double lastTime;
@@ -213,7 +271,7 @@ public class Main {
 			//Calls all callbacks
 			glfwPollEvents();
 			
-			update(deltaTime);
+			game.update(deltaTime);
 			
 			/*
 			 * Prepare rendering
@@ -222,7 +280,7 @@ public class Main {
 			glPushMatrix();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
-			render();
+			game.render();
 			
 			glPopMatrix();
 			glfwSwapBuffers(window);
@@ -233,19 +291,17 @@ public class Main {
 		
 	}
 	
+	/**
+	 * Called directly before the main loop starts.
+	 * Here the game is being initialized
+	 */
 	private void init() {
 		game = new Game();		
 	}
 	
-	private void update(double deltaTime) {
-		game.update(deltaTime);
-	}
-	
-	private void render() {
-		game.render();		
-	}
-	
-	
+	/**
+	 * this method closes the window. It should not be called before the game closes
+	 */
 	public void destroy() {
 				
 		//glfwReleaseCallbacks(window);

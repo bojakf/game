@@ -3,6 +3,7 @@ package network;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -15,21 +16,61 @@ import input.Mouse;
 import main.Game;
 import physics.Vector;
 
+/**
+ * 
+ * Handles one client on the server
+ * 
+ * @author jafi2
+ *
+ */
 public class NetHandle {
 	
+	/**
+	 * True if the client disconnected
+	 */
 	private boolean stop = false;
 	
+	/**
+	 * Thread handling output to the client
+	 */
 	private Thread outThread;
+	/**
+	 * Thread handling input from the client
+	 */
 	private Thread inThread;
 	
+	/**
+	 * Client socket
+	 */
 	private Socket client;
+	/**
+	 * the output stream to the client
+	 */
 	private ObjectOutputStream out;
+	/**
+	 * the input stream from the client
+	 */
 	private ObjectInputStream in;
 	
+	/**
+	 * the id of the player this client represents
+	 */
 	protected int playerID;
+	/**
+	 * Contains the state of all keys transmitted by the client
+	 */
 	protected HashMap<Integer, Integer> keyStates = new HashMap<>();
+	/**
+	 * Contains the last mouse position transmitted by the client
+	 */
 	protected Vector mousePos = new Vector();
 	
+	/**
+	 * Creates a new netHandle starts two threads for IO
+	 * @param client the clients socket
+	 * @param out the output thread for the client
+	 * @param in the input thread for the client
+	 */
 	public NetHandle(Socket client, ObjectOutputStream out, ObjectInputStream in) {
 		this.client = client;
 		this.out = out;
@@ -40,10 +81,16 @@ public class NetHandle {
 		inThread.start();
 	}
 	
+	/**
+	 * Closes the connection to the client
+	 */
 	public void close() {
 		stop = true;
 	}
 	
+	/**
+	 * The runnable for output operations
+	 */
 	private Runnable outRunnable = new Runnable() {
 		
 		@Override
@@ -72,7 +119,7 @@ public class NetHandle {
 					
 					for(int i = 0; i < Game.net.netObjects.size(); i++) {
 						
-						ArrayList<Object> data = new ArrayList<>();
+						ArrayList<Serializable> data = new ArrayList<>();
 						Game.net.netObjects.get(i).sendNetUpdate(data);
 						
 						out.writeByte(NetCommands.UPDATE_OBJECT);
@@ -111,6 +158,9 @@ public class NetHandle {
 		}
 	};
 	
+	/**
+	 * the runnable for input operations
+	 */
 	private Runnable inRunnable = new Runnable() {
 		
 		@Override

@@ -20,24 +20,41 @@ import physics.Collider;
 import physics.Physics;
 import physics.Vector;
 
+/**
+ * 
+ * Class for map walls
+ * 
+ * @author jafi2
+ *
+ */
 public class MapWall extends Collider implements Serializable, NetObject {
-
-	/*
-	 * FIXME this object does not do what it's supposed to do
-	 */
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5700843973237153515L;
 	
+	/**
+	 * Texture of the wall
+	 */
 	private String tex;
 	
+	/**
+	 * Create new wall with size 1, 1
+	 * @param pos the position of the wall
+	 * @param tex the texture of the wall
+	 */
 	public MapWall(Vector pos, String tex) {
 		super(pos, new Vector(1, 1), new Vector(), Physics.LAYER_WORLD);
 		this.tex = tex;
 	}
 	
+	/**
+	 * Create new wall
+	 * @param pos the position of the wall
+	 * @param size the size of the wall
+	 * @param tex the texture of the wall
+	 */
 	public MapWall(Vector pos, Vector size, String tex) {
 		super(pos, size, new Vector(), Physics.LAYER_WORLD);
 		this.tex = tex;
@@ -45,7 +62,6 @@ public class MapWall extends Collider implements Serializable, NetObject {
 	
 	@Override
 	public void update(double deltaTime) {
-		// TODO Auto-generated method stub
 		
 	}
 	
@@ -88,12 +104,7 @@ public class MapWall extends Collider implements Serializable, NetObject {
 	}
 
 	@Override
-	public Object[] getHitInfo() {
-		return null;
-	}
-
-	@Override
-	public void sendNetUpdate(ArrayList<Object> data) {
+	public void sendNetUpdate(ArrayList<Serializable> data) {
 		//FIXME don't do this
 //		data.add(pos);
 //		data.add(size);
@@ -102,7 +113,7 @@ public class MapWall extends Collider implements Serializable, NetObject {
 	}
 	
 	@Override
-	public void receiveNetUpdate(ArrayList<Object> data) {
+	public void receiveNetUpdate(ArrayList<Serializable> data) {
 		//FIXME don't do this
 //		pos = (Vector) data.get(0);
 //		size = (Vector) data.get(1);

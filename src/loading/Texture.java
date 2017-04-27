@@ -4,12 +4,35 @@ import static org.lwjgl.opengl.GL11.*;
 
 import java.nio.ByteBuffer;
 
+/**
+ * 
+ * This class is used to store a openGL Texture
+ * 
+ * @author jafi2
+ *
+ */
 public class Texture {
 	
+	/**
+	 * The id of the texture
+	 */
 	private int id;
+	/**
+	 * The width of the texture
+	 */
 	private int width;
+	/**
+	 * the height of the texture
+	 */
 	private int height;
 	
+	/**
+	 * Uploads a texture to the GPU
+	 * @param width the width of the texture
+	 * @param height the height of the texture
+	 * @param data the pixel information of the texture
+	 * @param nearest false: uses bilinear texture sampling, true: does not use texture sampling
+	 */
 	public Texture(int width, int height, ByteBuffer data, boolean nearest) {
 		
 		id = glGenTextures();
@@ -33,22 +56,40 @@ public class Texture {
 		
 	}
 	
+	/**
+	 * Bind the texture to use for rendering
+	 */
 	public void bind() {
 		glBindTexture(GL_TEXTURE_2D, id);
 	}
 	
-	public void delete() {
+	/**
+	 * Remove the texture from the GPU
+	 */
+	protected void delete() {
 		glDeleteTextures(id);
 	}
 
+	/**
+	 * get the width of the texture
+	 * @return the width
+	 */
 	public int getWidth() {
 		return width;
 	}
 
+	/**
+	 * get the height of the texture
+	 * @return the height
+	 */
 	public int getHeight() {
 		return height;
 	}
 	
+	/**
+	 * get the openGL texture id of the texture
+	 * @return the openGL texture id
+	 */
 	public int getID() {
 		return id;
 	}

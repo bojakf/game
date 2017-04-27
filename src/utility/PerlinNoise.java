@@ -1,12 +1,34 @@
 package utility;
 
+/**
+ * 
+ * Java implementation of perlin noise
+ * Perlin Noise is used to generate procedural environments and textures (e.g. Minecraft wrolds)
+ * <b>Warning: </b> Methods should not be used with natural numbers user scaling factor
+ * 
+ * @author jafi2
+ *
+ */
 public class PerlinNoise {
 	
+	/**
+	 * Array for use in perlin Noise calculation
+	 */
 	private int[] p;
 	
+	/**
+	 * After this distance the noise repeats even if it has not reached the end
+	 * use 0 to repeat only if the maximum distance of perlin noise is reached
+	 */
 	private int repeat = 0;
+	/**
+	 * Random for generating the p values
+	 */
 	private SRandom random;
 	
+	/**
+	 * Create PerlinNoise with random p values
+	 */
 	public PerlinNoise() {
 		
 		random = new SRandom();
@@ -21,6 +43,10 @@ public class PerlinNoise {
 		
 	}
 	
+	/**
+	 * Create PerlinNoise using specified seed for random p values
+	 * @param seed the seed used
+	 */
 	public PerlinNoise(long seed) {
 		
 		random = new SRandom(seed);
@@ -35,13 +61,20 @@ public class PerlinNoise {
 		
 	}
 	
+	/**
+	 * Get the PerlinNoise value for 3 coordinates
+	 * @param x the x position
+	 * @param y the y position
+	 * @param z the z position
+	 * @return the generated value
+	 */
 	public double perlin(double x, double y, double z) {
 		
 		x = format(x);
 		y = format(y);
 		z = format(z);
 		
-		if(x > 255 || y>255 || z>255) {
+		if(x > 255 || y>255 || z>255 || x<-256 || y<-256 || z<-256) {
 			new Exception("Warning noise is repeated!").printStackTrace();
 			/*
 			 * 
@@ -100,10 +133,20 @@ public class PerlinNoise {
 		
 	}
 	
+	/**
+	 * Get the PerlinNoise value for 2 coordinates
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @return the generated value
+	 */
 	public double perlin(double x, double y) {
 		
 		x = format(x);
 		y = format(y);
+		
+		if(x > 255 || y>255 || x<-256 || y<-256) {
+			new Exception("Warning noise is repeated!").printStackTrace();
+		}
 		
 		if(repeat>0) {
 			x = x%repeat;
@@ -138,17 +181,34 @@ public class PerlinNoise {
 		
 	}
 	
+	/**
+	 * fade function for perlinNoise
+	 * @param t the value to fade
+	 * @return the faded value
+	 */
 	public double fade(double t) {
 		return t * t * t * (t * (t * 6 - 15) + 10);
 	}
 	
+	/**
+	 * Method used for repeating perlin noise. Without repeating the number is only incremented.
+	 * @param num the number to increment
+	 * @return the incremented number
+	 */
 	public int inc(int num) {
 	    num++;
-	    if (repeat > 0) num %= repeat;
-	    
+	    if (repeat > 0) num %= repeat;    
 	    return num;
 	}
 	
+	/**
+	 * Some method for 3 dimensional perling noise
+	 * @param hash no idea what this does
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @param z the z coordinate
+	 * @return the formated number
+	 */
 	public double grad(int hash, double x, double y, double z) {
 		int h = hash & 15;
 		double u = h < 8 ? x : y;
@@ -166,6 +226,13 @@ public class PerlinNoise {
 		return ((h&1) == 0 ? u : -u)+((h&2) == 0 ? v : -v);
 	}
 	
+	/**
+	 * Some method for 3 dimensional perling noise
+	 * @param hash no idea what this does
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @return the formated number
+	 */
 	public double grad(int hash, double x, double y) {
 		int h = hash & 15;
 		double u = h < 8 ? x : y;
@@ -181,6 +248,14 @@ public class PerlinNoise {
 		return ((h&1) == 0 ? u : -u)+((h&2) == 0 ? v : -v);
 	}
 	
+	/**
+	 * Faster implementation of grad
+	 * @param hash no idea what this does
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @param z the z coordinate
+	 * @return the formated number
+	 */
 	public double fastGrad(int hash, double x, double y, double z) {
 		switch(hash & 0xF)
 	    {
@@ -204,10 +279,27 @@ public class PerlinNoise {
 	    }
 	}
 	
+	/**
+	 * smoothly interpolate between two values
+	 * @param a the start value
+	 * @param b the target value
+	 * @param x percent of way done to b
+	 * @return interpolated value
+	 */
 	public double lerp(double a, double b, double x) {
 		return a + x * (b-a);
 	}
 	
+	/**
+	 * Adds more detail to the perlinNoise<br>
+	 * Performance is approximately perlin(x,y,z)*persistence
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @param z the z coordinate
+	 * @param octaves the number of times the result should be refined
+	 * @param persistence the drop off of the effect on the result per calculation
+	 * @return the value calculated
+	 */
 	public double OctavePerlin(double x, double y, double z, int octaves, double persistence) {
 	    double total = 0;
 	    double frequency = 1;
@@ -225,6 +317,15 @@ public class PerlinNoise {
 	    return total/maxValue;
 	}
 	
+	/**
+	 * Adds more detail to the perlinNoise<br>
+	 * Performance is approximately perlin(x,y)*persistence
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @param octaves the number of times the result should be refined
+	 * @param persistence the drop off of the effect on the result per calculation
+	 * @return the value calculated
+	 */
 	public double OctavePerlin(double x, double y, int octaves, double persistence) {
 	    double total = 0;
 	    double frequency = 1;
@@ -242,6 +343,12 @@ public class PerlinNoise {
 	    return total/maxValue;
 	}
 	
+	/**
+	 * Makes the double positive there may be more efficient methods
+	 * It is also a placeholder for further formatting
+	 * @param d the value which should be formated
+	 * @return the formated value
+	 */
 	private double format(double d) {
 		
 		if(d < 0) {
@@ -256,7 +363,10 @@ public class PerlinNoise {
 		
 	}
 	
-	
+	/**
+	 * Get the seed of the random Object used to generate the PerlinNoise
+	 * @return the seed
+	 */
 	public long getSeed() {
 		return random.getSeed();
 	}

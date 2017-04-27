@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import input.Keyboard;
@@ -21,6 +22,13 @@ import physics.Ray;
 import physics.RaycastHit;
 import physics.Vector;
 
+/**
+ * 
+ * This is the player class. It represents one player in the game. The player receives only input form the player identified by the playerID parameter
+ * 
+ * @author jafi2
+ *
+ */
 public class Player extends Collider implements NetPlayer {
 
 	/**
@@ -28,17 +36,42 @@ public class Player extends Collider implements NetPlayer {
 	 */
 	private static final long serialVersionUID = -5203099848561064804L;
 
+	/**
+	 * The maximum speed of the player
+	 */
 	private static final double PLAYER_SPEED = 3;
 	
-	private int playerID;
+	/**
+	 * The id of the player who's input is used to control the player
+	 */
+	private final int playerID;
 	
+	/**
+	 * Start and end of the player's laser
+	 */
 	private Vector laserStart, laserEnd;
+	/**
+	 * Is the player's laser turned on
+	 */
 	private boolean laserOn = false;
 	
+	/**
+	 * keyListener of the player
+	 */
 	private transient KeyListener keyListener = null;
+	/**
+	 * mouseListener of the player
+	 */
 	private transient MouseListener mouseListener = null;
+	/**
+	 * mouseMotionListener of the player
+	 */
 	private transient MouseMotionListener mouseMotionListener = null;
 	
+	/**
+	 * Creates the player
+	 * @param playerID the player who's input is used
+	 */
 	public Player(int playerID) {
 		
 		super(new Vector(10, 10), new Vector(1, 1), new Vector(), Physics.LAYER_PLAYER);
@@ -69,20 +102,22 @@ public class Player extends Collider implements NetPlayer {
 	public void update(double deltaTime) {
 		
 		if(Keyboard.isKeyDown(GLFW.GLFW_KEY_W, playerID)) {
-			velocity.y = PLAYER_SPEED;
+			velocity.y = 1;
 		} else if(Keyboard.isKeyDown(GLFW.GLFW_KEY_S, playerID)) {
-			velocity.y = -PLAYER_SPEED;
+			velocity.y = -1;
 		} else {
 			velocity.y = 0;
 		}		
 		
 		if(Keyboard.isKeyDown(GLFW.GLFW_KEY_D, playerID)) {
-			velocity.x = PLAYER_SPEED;
+			velocity.x = 1;
 		} else if(Keyboard.isKeyDown(GLFW.GLFW_KEY_A, playerID)) {
-			velocity.x = -PLAYER_SPEED;
+			velocity.x = -1;
 		} else {
 			velocity.x = 0;
 		}
+		velocity.normalize();
+		velocity.scale(PLAYER_SPEED);
 		
 		if(laserOn) {
 			
@@ -171,13 +206,7 @@ public class Player extends Collider implements NetPlayer {
 	}
 
 	@Override
-	@Deprecated
-	public Object[] getHitInfo() {
-		return null;
-	}
-
-	@Override
-	public void sendNetUpdate(ArrayList<Object> data) {
+	public void sendNetUpdate(ArrayList<Serializable> data) {
 		data.add(pos);
 		data.add(size);
 		data.add(velocity);
@@ -187,33 +216,13 @@ public class Player extends Collider implements NetPlayer {
 	}
 
 	@Override
-	public void receiveNetUpdate(ArrayList<Object> data) {
+	public void receiveNetUpdate(ArrayList<Serializable> data) {
 		pos = (Vector) data.get(0);
 		size = (Vector) data.get(1);
 		velocity = (Vector) data.get(2);
 		laserStart = (Vector) data.get(3);
 		laserEnd = (Vector) data.get(4);
 		laserOn = (boolean) data.get(5);
-	}
-
-	@Override
-	public KeyListener getKeyListener() {
-		return keyListener;
-	}
-	
-	@Override
-	public CharListener getCharListener() {
-		return null;
-	}
-
-	@Override
-	public MouseListener getMouseListener() {
-		return mouseListener;
-	}
-	
-	@Override
-	public MouseMotionListener getMouseMotionListener() {
-		return mouseMotionListener;
 	}
 
 	@Override

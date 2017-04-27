@@ -29,6 +29,14 @@ import main.Game;
 import main.Main;
 import physics.Vector;
 
+/**
+ * 
+ * This class is used to receive input from the mouse.
+ * The appearance of the mouse can be changed too.
+ * 
+ * @author jafi2
+ *
+ */
 public class Mouse {
 
 	/*
@@ -36,19 +44,56 @@ public class Mouse {
 	 * TODO fix setCursorMode
 	 */
 	
+	/**
+	 * this class contains only static methods
+	 */
+	private Mouse() {}
+	
+	/**
+	 * has the class been initialized?
+	 */
 	private static boolean init = false;
+	/**
+	 * id of the current openGL window
+	 */
 	private static long window = -1;
 	
+	/**
+	 * Contains all mouse motion listeners
+	 */
 	private static HashMap<Integer, ArrayList<MouseMotionListener>> mouseMotionListeners = new HashMap<>();
+	/**
+	 * Contains all mouse button listeners
+	 */
 	private static HashMap<Integer, ArrayList<MouseListener>> mouseButtonListeners = new HashMap<>();
 	
+	/**
+	 * Callback for the current position of the mouse
+	 */
 	private static GLFWCursorPosCallback cursorPosCallback;
+	/**
+	 * Callback for mouse entering and exiting the window
+	 */
 	private static GLFWCursorEnterCallback cursorEnterCallback;
+	/**
+	 * Callback for the mouse buttons
+	 */
 	private static GLFWMouseButtonCallback mouseButtonCallback;
+	/**
+	 * Callback for mouse scrolling
+	 */
 	private static GLFWScrollCallback scrollCallback;
 	
+	/**
+	 * Last reported position of the mouse. Used to determine the delta between two inputs
+	 */
 	private static double lx = -1, ly = -1;
 	
+	/**
+	 * Initializes the Mouse input<br>
+	 * this class should not be used without calling this method first
+	 * @param window the id of the openGL window
+	 */
 	public static void init(long window) {
 		
 		if(init) {
@@ -153,6 +198,9 @@ public class Mouse {
 		
 	}
 	
+	/**
+	 * Clears up the mouse listeners and releases the mouse callbacks
+	 */
 	public static void destroy() {
 		
 		init = false;
@@ -168,6 +216,11 @@ public class Mouse {
 		
 	}
 	
+	/**
+	 * Returns the x position of the Mouse relative to the window for the given player
+	 * @param playerID the id of the player who's input should by used
+	 * @return the x position of the Mouse relative to the window
+	 */
 	public static double x(int playerID) {
 		
 		if(playerID == Game.net.playerID) {
@@ -182,6 +235,11 @@ public class Mouse {
 		
 	}
 	
+	/**
+	 * Returns the y position of the Mouse relative to the window for the given player
+	 * @param playerID the id of the player who's input should by used
+	 * @return the y position of the Mouse relative to the window
+	 */
 	public static double y(int playerID) {
 		
 		if(playerID == Game.net.playerID) {
@@ -196,6 +254,11 @@ public class Mouse {
 		
 	}
 	
+	/**
+	 * Returns the xy position of the Mouse relative to the window for the given player
+	 * @param playerID the id of the player who's input should by used
+	 * @return the xy position of the Mouse relative to the window
+	 */
 	public static Vector xy(int playerID) {
 		
 		if(playerID == Game.net.playerID) {
@@ -210,13 +273,24 @@ public class Mouse {
 		
 	}
 	
+	/**
+	 * Sets the position of the mouse for the given player
+	 * @param x the new x position of the mouse
+	 * @param y the new y position of the mouse
+	 * @param playerID the id of the player who's mouse should be moved
+	 */
 	@Deprecated
-	public static void setCursorPos(double x, double y) {
+	public static void setCursorPos(double x, double y, int playerID) {
 		glfwSetCursorPos(window, x, y);
 	}
 	
+	/**
+	 * Sets the visibility mode of the cursor (disabled, hidden, normal)
+	 * @param cm the new mode of the cursor
+	 * @param playerID the id of the player who's mouse should be modified
+	 */
 	@Deprecated
-	public static void setCursorMode(CursorMode cm) {
+	public static void setCursorMode(CursorMode cm, int playerID) {
 		
 		if(cm == CursorMode.disabled) {
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -228,10 +302,28 @@ public class Mouse {
 		
 	}
 	
+	/**
+	 * 
+	 * Available modes for the cursor
+	 * <ul>
+	 * <li>disabled - the cursor is invisible and grabbed inside the window providing virtual and unlimited cursor movement</li>
+	 * <li>hidden - the cursor is invisible as long as the cursor is above the window</li>
+	 * <li>normal - the default cursor behavior</li>
+	 * </ul>
+	 * 
+	 * @author jafi2
+	 *
+	 */
 	public enum CursorMode {
 		disabled, hidden, normal
 	}
 	
+	/**
+	 * Runs the onPress event for the given player
+	 * @param button the mouse button pressed
+	 * @param modifiers the modifier keys used
+	 * @param playerID the id of the player
+	 */
 	public static void runOnPress(int button, int modifiers, int playerID) {
 		ArrayList<MouseListener> a = mouseButtonListeners.get(playerID);
 		for(int i = 0; a != null && i < a.size(); i++) {
@@ -239,6 +331,12 @@ public class Mouse {
 		}
 	}
 	
+	/**
+	 * Runs the onRelease event for the given player
+	 * @param button the mouse button pressed
+	 * @param modifiers the modifier keys used
+	 * @param playerID the id of the player
+	 */
 	public static void runOnRelease(int button, int modifiers, int playerID) {
 		ArrayList<MouseListener> a = mouseButtonListeners.get(playerID);
 		for(int i = 0; a != null && i < a.size(); i++) {
@@ -246,6 +344,11 @@ public class Mouse {
 		}
 	}
 	
+	/**
+	 * Runs the onScroll event for the given player
+	 * @param delta the number of times scrolled
+	 * @param playerID the id of the player
+	 */
 	public static void runOnScroll(double delta, int playerID) {
 		ArrayList<MouseListener> a = mouseButtonListeners.get(playerID);
 		for(int i = 0; a != null && i < a.size(); i++) {
@@ -253,6 +356,12 @@ public class Mouse {
 		}
 	}
 	
+	/**
+	 * Runs the onMove event for the given player
+	 * @param dx the number of pixels moved in the x direction
+	 * @param dy the number of pixels moved in the y direction
+	 * @param playerID the id of the player
+	 */
 	public static void runOnMove(double dx, double dy, int playerID) {
 		ArrayList<MouseMotionListener> a = mouseMotionListeners.get(playerID);
 		for(int i = 0; a != null && i < a.size(); i++) {
@@ -260,6 +369,10 @@ public class Mouse {
 		}
 	}
 	
+	/**
+	 * Runs the onEnter event for the given player
+	 * @param playerID the id of the player
+	 */
 	public static void runOnEnter(int playerID) {
 		ArrayList<MouseMotionListener> a = mouseMotionListeners.get(playerID);
 		for(int i = 0; a != null && i < a.size(); i++) {
@@ -267,6 +380,10 @@ public class Mouse {
 		}
 	}
 	
+	/**
+	 * Runs the onExit event for the given player
+	 * @param playerID the id of the player
+	 */
 	public static void runOnExit(int playerID) {
 		ArrayList<MouseMotionListener> a = mouseMotionListeners.get(playerID);
 		for(int i = 0; a != null && i < a.size(); i++) {
@@ -274,6 +391,11 @@ public class Mouse {
 		}
 	}
 	
+	/**
+	 * Adds a mouse motion listener for the given player
+	 * @param mm the mouse motion listener
+	 * @param playerID the id of the player
+	 */
 	public static void addMouseMotionListener(MouseMotionListener mm, int playerID) {
 		if(mouseMotionListeners.containsKey(playerID)) {
 			mouseMotionListeners.get(playerID).add(mm);
@@ -284,6 +406,11 @@ public class Mouse {
 		}
 	}
 	
+	/**
+	 * Adds a mouse button listener for the given player
+	 * @param mb the mouse button listener
+	 * @param playerID the id of the player
+	 */
 	public static void addMouseButtonListener(MouseListener mb, int playerID) {
 		if(mouseButtonListeners.containsKey(playerID)) {
 			mouseButtonListeners.get(playerID).add(mb);
@@ -294,25 +421,76 @@ public class Mouse {
 		}
 	}
 	
+	/**
+	 * Removes the given mouse motion listener for the given player
+	 * @param mm the mouse motion listener
+	 * @param playerID the id of the player
+	 * @return did the listener get removed<br>Also returns false if the listener was not found
+	 */
 	public static boolean removeMouseMotionListener(MouseMotionListener mm, int playerID) {
 		if(!mouseMotionListeners.containsKey(playerID)) return false;
 		return mouseMotionListeners.get(playerID).remove(mm);
 	}
 	
+	/**
+	 * Removes the given mouse button listener for the given player
+	 * @param mb the mouse button listener
+	 * @param playerID the id of the player
+	 * @return did the listener get removed<br>Also returns false if the listener was not found
+	 */
 	public static boolean removeMouseButtonListener(MouseListener mb, int playerID) {
 		if(!mouseButtonListeners.containsKey(playerID)) return false;
 		return mouseButtonListeners.get(playerID).remove(mb);
 	}
 	
+	/**
+	 * 
+	 * Class for listening to mouse button and scroll input
+	 * 
+	 * @author jafi2
+	 *
+	 */
 	public static abstract class MouseListener {
+		/**
+		 * Called if a mouse button is pressed down
+		 * @param button the number of the button
+		 * @param modifiers the modifier keys pressed
+		 */
 		public abstract void onPress(int button, int modifiers);
+		/**
+		 * Called if a mouse button is released
+		 * @param button the number of the button
+		 * @param modifiers the modifier keys pressed
+		 */
 		public abstract void onRelease(int button, int modifiers);
+		/**
+		 * Called if the mouse wheel is moved
+		 * @param delta the number of times scrolled
+		 */
 		public abstract void onScroll(double delta);
 	}
 	
+	/**
+	 * 
+	 * Class for listening to mouse movement
+	 * 
+	 * @author jafi2
+	 *
+	 */
 	public static abstract class MouseMotionListener {
+		/**
+		 * Called if the mouse has moved
+		 * @param dx the number of pixels moved in the x direction
+		 * @param dy the number of pixels moved in the y direction
+		 */
 		public abstract void onMove(double dx, double dy);
+		/**
+		 * Called if the mouse enters the window
+		 */
 		public abstract void onEnter();
+		/**
+		 * Called if the mouse leaves the window
+		 */
 		public abstract void onExit();
 	}
 	

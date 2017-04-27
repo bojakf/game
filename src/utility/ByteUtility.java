@@ -2,8 +2,20 @@ package utility;
 
 import java.nio.ByteBuffer;
 
+/**
+ * 
+ * utility for byteBuffers
+ * 
+ * @author jafi2
+ *
+ */
 public class ByteUtility {
 
+	/**
+	 * Convert double to 2 ints in order to be able to perform bitwise operations on it
+	 * @param value the double to convert
+	 * @return the converted integers
+	 */
 	public static int[] doubleToInts(double value) {
 		
 		byte bytes[] = new byte[8];
@@ -17,6 +29,11 @@ public class ByteUtility {
 		
 	}
 	
+	/**
+	 * Reverse method of the above one
+	 * @param value the integers to convert back into a double
+	 * @return the double
+	 */
 	public static double intsToDouble(int value[]) {		
 		
 		ByteBuffer b = ByteBuffer.allocate(8);

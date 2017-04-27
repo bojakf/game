@@ -6,16 +6,50 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
+/**
+ *
+ * Contains physical calculations
+ * 
+ * @author jafi2
+ *
+ */
 public class Physics {
 	
+	/*
+	 * Number of available layers
+	 */
 	public static final int LAYERS = 4;
 	
+	/**
+	 * default physical layer <br>will sometimes automatically replace invalid layers
+	 */
 	public static final int LAYER_DEFAULT = 0;
+	/**
+	 * physical layer which should only be used for players
+	 */
 	public static final int LAYER_PLAYER = 1;
+	/**
+	 * physical layer for enemies
+	 */
 	public static final int LAYER_ENEMY = 2;
+	/**
+	 * physical layer for world
+	 */
 	public static final int LAYER_WORLD = 3;
 	
-	private static boolean NONE = false; //Placeholder for collision Matrix
+	/**
+	 * This value is intended for raycasting in order to ignore the isBlocking value
+	 * it can be used with bitwise or on the layer
+	 */
+	public static final int RAYCAST_ALL = 0x80000000;
+	
+	/**
+	 * Placeholder for collisionMatrix
+	 */
+	private static boolean NONE = false;
+	/**
+	 * holds information with which layers another can collide
+	 */
 	private static boolean collisionMatrix[][] = new boolean[][] {
 					//Default	Player	Enemy	World
 		/*Default*/	{true,		true,	true,	true},
@@ -24,16 +58,37 @@ public class Physics {
 		/*World*/	{NONE,		NONE,	NONE,	false},
 	};
 	
+	/**
+	 * contains all active colliders
+	 */
 	private static ArrayList<Collider> colliders = new ArrayList<Collider>();
 	
+	/**
+	 * This class contains only static methods
+	 */
+	private Physics() {}
+	
+	/**
+	 * Adds collider to physics
+	 * @param col Collider to add
+	 */
 	public static void registerCollider(Collider col) {
 		colliders.add(col);
 	}
 	
 	/*
 	 * FIXME use force instead of velocity
+	 * TODO add drag
 	 */
 	
+	/**
+	 * This method should be called regularly if the game is not paused
+	 * <ul>
+	 * <li>Updates the positions of all physicals objects</li>
+	 * <li>calls collision Events</li>
+	 * </ul>
+	 * @param deltaTime time since last calculation
+	 */
 	public static void physicsUpdate(double deltaTime) {
 		
 		if(deltaTime>1d/20d) System.err.println("Low framerates may cause problems. Cur: " + 1/deltaTime);
@@ -169,8 +224,8 @@ public class Physics {
 	 * 
 	 * Raycast method using default layer
 	 * 
-	 * @param ray 			Ray to cast
-	 * @return				hit infomation
+	 * @param ray Ray to cast
+	 * @return hit infomation @see {@link RaycastHit}
 	 */
 	public static RaycastHit raycast(Ray ray) {
 		return raycast(ray, LAYER_DEFAULT);		
@@ -178,13 +233,20 @@ public class Physics {
 	
 	/**
 	 * 
-	 * Raycast method
+	 * Raycast method<br>
+	 * <b>Info: </b> layer | RAYCAST_ALL in order to ignore the isBlocking value in collider
 	 * 
 	 * @param ray 			Ray to cast
 	 * @param layer			Layer which should be used for raycast
-	 * @return				hit infomation
+	 * @return				hit infomation @see {@link RaycastHit}
 	 */
 	public static RaycastHit raycast(Ray ray, int layer) {
+		
+		boolean ignoreBlocking = false;
+		if((layer | RAYCAST_ALL) != 0) {
+			layer = layer & ~RAYCAST_ALL;
+			ignoreBlocking = true;
+		}
 		
 		if(layer < 0 || layer > LAYERS) {
 			new Exception("Invalid Layer! using default").printStackTrace();
@@ -196,7 +258,7 @@ public class Physics {
 		for(int i = 0; i < colliders.size(); i++) {
 			
 			Collider col = colliders.get(i);
-			if(!col.isBlocking) continue;
+			if(!ignoreBlocking && !col.isBlocking) continue;
 			
 			if(!_canCollide(col.layer, layer)) continue;
 			
@@ -269,9 +331,9 @@ public class Physics {
 	}
 	
 	/**
-	 * Check if colliders at this layers can collide
-	 * @param layer1 - first collider
-	 * @param layer2 - second collider
+	 * Check if this layers can collide
+	 * @param layer1 first layer
+	 * @param layer2 second layer
 	 * @return can they collide?
 	 */
 	public static boolean canCollide(int layer1, int layer2) {
@@ -286,10 +348,10 @@ public class Physics {
 	}
 	
 	/**
-	 * canCollide for internal use(no error checking)
-	 * @param layer1
-	 * @param layer2
-	 * @return
+	 * {@link canCollide} for internal use (no error checking)
+	 * @param layer1 first layer
+	 * @param layer2 second layer
+	 * @return can they collide?
 	 */
 	private static boolean _canCollide(int layer1, int layer2) {
 		
