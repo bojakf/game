@@ -22,6 +22,7 @@ public class Physics {
 	
 	/**
 	 * default physical layer <br>will sometimes automatically replace invalid layers
+	 * can collide with all other layer
 	 */
 	public static final int LAYER_DEFAULT = 0;
 	/**
@@ -261,6 +262,108 @@ public class Physics {
 			if(!ignoreBlocking && !col.isBlocking) continue;
 			
 			if(!_canCollide(col.layer, layer)) continue;
+			
+			Vector min = new Vector(col.pos.x, col.pos.y);
+			Vector max = new Vector(col.pos.x + col.size.x, col.pos.y + col.size.y);
+			Vector dis = new Vector(-1,-1);
+			
+			boolean inside = true;
+			
+			if(ray.origin.x < min.x) {
+				inside = false;
+				dis.x = (min.x-ray.origin.x)/ray.dir.x;
+			} else if(ray.origin.x > max.x) {
+				inside = false;
+				dis.x = (max.x-ray.origin.x)/ray.dir.x;
+			}
+			
+			if(ray.origin.y < min.y) {
+				inside = false;
+				dis.y = (min.y-ray.origin.y)/ray.dir.y;
+			} else if(ray.origin.y > max.y) {
+				inside = false;
+				dis.y = (max.y-ray.origin.y)/ray.dir.y;
+			}
+			
+			/*
+			 * Ray starts inside of collider 
+			 */
+			if(inside) {
+				RaycastHit hit = new RaycastHit();
+				hit.distance = 0;
+				hit.hit = col;
+				hit.pos = ray.origin;
+				hits.add(hit);
+				continue;
+			}
+			
+			double plane = dis.x;
+			if(dis.y < plane) {
+				plane = dis.y;
+			}
+			
+			RaycastHit hit = new RaycastHit();
+			hit.hit = col;
+			hit.pos = new Vector();
+			
+			hit.pos.x = ray.origin.x + plane * ray.dir.x;
+			if(hit.pos.x < min.x || hit.pos.x > max.x) continue;
+			
+			hit.pos.y = ray.origin.y + plane * ray.dir.y;
+			if(hit.pos.y < min.y || hit.pos.y > max.y) continue;
+			
+			
+			hit.distance = Vector.substract(ray.origin, hit.pos).length();
+			hits.add(hit);
+			
+		}
+		
+		if(hits.size() == 0) return null;
+		
+		RaycastHit hit = hits.get(0);
+		for(RaycastHit h : hits) {
+			if(h.distance < hit.distance) {
+				hit = h;
+			}
+		}
+		
+		return hit;
+		
+	}
+	
+	/**
+	 * 
+	 * Raycast method with ability to ignore certain objects<br>
+	 * <b>Info: </b> layer | RAYCAST_ALL in order to ignore the isBlocking value in collider
+	 * 
+	 * @param ray 			Ray to cast
+	 * @param layer			Layer which should be used for raycast
+	 * @param ignore		Colliders to ignore, this value must not be null
+	 * @return				hit information @see {@link RaycastHit}
+	 */
+	public static RaycastHit raycast(Ray ray, int layer, ArrayList<Collider> ignore) {
+		
+		boolean ignoreBlocking = false;
+		if((layer | RAYCAST_ALL) != 0) {
+			layer = layer & ~RAYCAST_ALL;
+			ignoreBlocking = true;
+		}
+		
+		if(layer < 0 || layer > LAYERS) {
+			new Exception("Invalid Layer! using default").printStackTrace();
+			layer = LAYER_DEFAULT;
+		}
+		
+		ArrayList<RaycastHit> hits = new ArrayList<RaycastHit>();
+		
+		for(int i = 0; i < colliders.size(); i++) {
+			
+			Collider col = colliders.get(i);
+			if(!ignoreBlocking && !col.isBlocking) continue;
+			
+			if(!_canCollide(col.layer, layer)) continue;
+			
+			if(ignore.contains(col)) continue;
 			
 			Vector min = new Vector(col.pos.x, col.pos.y);
 			Vector max = new Vector(col.pos.x + col.size.x, col.pos.y + col.size.y);

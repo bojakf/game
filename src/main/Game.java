@@ -1,10 +1,18 @@
 package main;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+
+import javax.swing.JOptionPane;
 
 import debug.Debug;
+import levels.Level;
+import levels.MainMenu;
+import levels.OnlineGame;
 import loading.TexManager;
 import map.Map;
 import map.Player;
@@ -78,6 +86,17 @@ public class Game {
 	public static Network net;
 	
 	/**
+	 * The path of the games jar file
+	 * this value is null until new Game() is called the first time
+	 */
+	public static String gamePath;
+	
+	/**
+	 * The currently shown level
+	 */
+	private static Level curLevel;
+	
+	/**
 	 * The Thread calculating physics
 	 */
 	private Thread physicsThread;
@@ -88,61 +107,59 @@ public class Game {
 	 */
 	public Game() {
 		
-		//TODO don't use static path
-		TexManager.loadTex("grass", "D:\\workspace\\git\\Game\\textures\\grass.jpg");
-		TexManager.loadTex("wall", "D:\\workspace\\git\\Game\\textures\\wall.png");
-		TexManager.loadTex("player", "D:\\workspace\\git\\Game\\textures\\player.gif");
+		/*
+		 * Get Location of Game
+		 */
+		
+		String fileName = "/" + new File(Main.class.getProtectionDomain()
+				  .getCodeSource()
+				  .getLocation()
+				  .getPath())
+				.getName();
+		
+		try {
+			gamePath = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().replaceFirst("/", "");
+			for(int i = 0; i < gamePath.length(); i++) {
+				if(gamePath.charAt(i) == '/') {
+					gamePath = gamePath.substring(0, i) + File.separator + gamePath.substring(i+1, gamePath.length());
+				}
+			}
+			if(gamePath.endsWith("bin" + File.separator)) {
+				gamePath = gamePath.substring(0, gamePath.length()-5);
+			} else {
+				gamePath = gamePath.substring(0, gamePath.length()-fileName.length());
+			}
+			gamePath = gamePath.concat(File.separator);
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+		
+		/*
+		 * Load textures
+		 */
+		
+		TexManager.loadTex("grass", gamePath + "textures\\grass.jpg");
+		TexManager.loadTex("wall", gamePath + "textures\\wall.png");
+		TexManager.loadTex("player", gamePath + "textures\\player.gif");
 		
 		try {
 			new ServerSocket(25565).close();
-			net = Network.createServer(25565);
-		} catch (IOException e) {
-			net = Network.connectToServer(InetAddress.getLoopbackAddress(), 25565);
+			curLevel = new OnlineGame(25565);
+		} catch(Exception e) {
+			curLevel = new OnlineGame(InetAddress.getLoopbackAddress(), 25565);
 		}
 		
-		if(net.isServer()) {
+		//curLevel = new MainMenu();
 		
-			physicsThread = new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					
-					//Max Physics update rate
-					final double MAX_UPDATES_PER_SECOND = 60;
-					
-					double last = System.nanoTime();
-					
-					while(!Main.isClosing) {
-					
-						double now = System.nanoTime();
-						double deltaTime = (now-last)/1000000000d;
-							
-						if(1/deltaTime > MAX_UPDATES_PER_SECOND) {
-							double sleepTime = (1/MAX_UPDATES_PER_SECOND - deltaTime)*1000;
-							try {
-								Thread.sleep((long) sleepTime);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-							now = System.nanoTime();
-							deltaTime = (now-last)/1000000000d;
-						}
-						last = now;
-						
-						Physics.physicsUpdate(deltaTime);
-						
-					}				
-					
-				}
-			}, "Physics");
-			physicsThread.start();
-			
-			new Map();
-			
-			net.registerNetPlayer(new Player(0));
-		
-		}
-		
+	}
+	
+	/**
+	 * Changes the level. Calls onClose on the removed level
+	 * @param lvl the new level
+	 */
+	public void changeLevel(Level lvl) {
+		curLevel.onClose();
+		curLevel = lvl;
 	}
 	
 	/**
@@ -152,9 +169,7 @@ public class Game {
 	 * @param deltaTime time since the last update
 	 */
 	protected void update(double deltaTime) {
-		if(net.isServer()) {
-			net.updateNetObjects(deltaTime); 
-		}
+		curLevel.update(deltaTime);
 	}
 	
 	/**
@@ -164,10 +179,9 @@ public class Game {
 	 */
 	protected void render() {
 		
-		net.renderNetObjects();
+		curLevel.render();
 		
 		Physics.drawColliders();
-		
 		Debug.renderDebug();
 		
 	}

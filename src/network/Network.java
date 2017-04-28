@@ -17,15 +17,13 @@ import physics.Vector;
 public class Network {
 	
 	/*
-	 * TODO replace Mouse deprecated methods for server clients
+	 * TODO do not update correct information compare with cloned objects
+	 * TODO bundle output to one thread (without initialization)
+	 * http://stackoverflow.com/questions/7987395/how-to-write-data-to-two-java-io-outputstream-objects-at-once
 	 */
 	
 	/*
 	 * TODO add client update for visuals
-	 */
-	
-	/*
-	 * TODO send new objects during runntime to clients
 	 */
 	
 	/*
@@ -34,6 +32,10 @@ public class Network {
 	
 	/*
 	 * TODO remove player after disconnect
+	 */
+	
+	/*
+	 * TODO automatically differentiate between netPlayer and netObject and between server and client in on method call
 	 */
 	
 	/**
@@ -115,7 +117,8 @@ public class Network {
 	
 	/**
 	 * Updates all network Objects, should be called once per frame on the server.<br>
-	 * Clients are not allowed to call this method
+	 * Clients are not allowed to call this method.<br>
+	 * netObject whose colliders are destroyed are queued for removal in this method
 	 * @param deltaTime time since last update
 	 */
 	public void updateNetObjects(double deltaTime) {
@@ -126,6 +129,14 @@ public class Network {
 		}
 		
 		for(int i = 0; i < netObjects.size(); i++) {
+			if(netObjects.get(i).isPendingDestroy()) {
+				for(int a = 0; a < server.handles.size(); a++) {
+					server.handles.get(a).removeNetObject(i);
+					netObjects.remove(i);
+				}
+				i--;
+				continue;
+			}
 			netObjects.get(i).update(deltaTime);
 		}
 		
@@ -142,8 +153,11 @@ public class Network {
 			new Exception("Clients cannot register objects").printStackTrace();
 			return;
 		}
+		
+		for(int i = 0; i < server.handles.size(); i++) {
+			server.handles.get(i).sendNetObject(obj);
+		}
 		netObjects.add(obj);
-		//TODO send Object to clients
 		
 	}
 	
@@ -158,9 +172,12 @@ public class Network {
 			new Exception("Clients cannot register objects").printStackTrace();
 			return;
 		}
+		
+		for(int i = 0; i < server.handles.size(); i++) {
+			server.handles.get(i).sendNetObject(obj);
+		}
 		netObjects.add(obj);
 		netPlayers.add(obj);
-		//TODO send Player to clients
 		
 	}
 	
@@ -201,7 +218,7 @@ public class Network {
 				return n.keyStates;
 			}
 		}
-		new Exception("No input found for player " + playerID).printStackTrace();
+		
 		return null;
 	}
 	

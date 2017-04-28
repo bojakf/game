@@ -27,7 +27,7 @@ import physics.Vector;
  * @author jafi2
  *
  */
-public class MapWall extends Collider implements Serializable, NetObject {
+public class MapWall extends Collider implements Serializable {
 	
 	/**
 	 * 

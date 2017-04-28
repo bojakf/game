@@ -122,4 +122,9 @@ public class MapFloor implements Serializable, NetObject {
 //		tex = (String) data.get(2);
 	}
 
+	@Override
+	public boolean isPendingDestroy() {
+		return false;
+	}
+
 }

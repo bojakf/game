@@ -53,6 +53,15 @@ public class NetHandle {
 	private ObjectInputStream in;
 	
 	/**
+	 * Contains the objects queued for sending to the client
+	 */
+	private ArrayList<NetObject> sendQueue = new ArrayList<>();
+	/**
+	 * Contains all objects queued for removal
+	 */
+	private ArrayList<Integer> removeQueue = new ArrayList<>();
+	
+	/**
 	 * the id of the player this client represents
 	 */
 	protected int playerID;
@@ -77,6 +86,7 @@ public class NetHandle {
 		this.in = in;
 		outThread = new Thread(outRunnable, "Client " + playerID + " out");
 		inThread = new Thread(inRunnable, "Client " + playerID + " in");
+		sendQueue.clear();
 		outThread.start();
 		inThread.start();
 	}
@@ -117,6 +127,30 @@ public class NetHandle {
 				
 				try {
 					
+					/*
+					 * remove objects
+					 */
+					while(removeQueue.size() > 0) {
+						out.writeByte(NetCommands.REMOVE_OBJECT);
+						out.writeInt(removeQueue.remove(0));
+					}
+					
+					/*
+					 * send new objects to client 
+					 */
+					while(sendQueue.size() > 0) {
+						
+						NetObject obj = sendQueue.remove(0);
+						if(obj instanceof NetPlayer)
+							out.writeByte(NetCommands.ADD_PLAYER);
+						else 
+							out.writeByte(NetCommands.ADD_OBJECT);
+						out.writeObject(obj);
+					}
+					
+					/*
+					 * send updates for already existing objects to client 
+					 */
 					for(int i = 0; i < Game.net.netObjects.size(); i++) {
 						
 						ArrayList<Serializable> data = new ArrayList<>();
@@ -159,6 +193,23 @@ public class NetHandle {
 	};
 	
 	/**
+	 * Sends a new object to the client. The object must not be in the netObjects list before this method is called and the method must not be called 
+	 * with the same object twice.
+	 * @param obj the object
+	 */
+	protected void sendNetObject(NetObject obj) {
+		sendQueue.add(obj);
+	}
+	
+	/**
+	 * Removes a net object from the client. The object must be removed from netObjects list after this method was called
+	 * @param id the id(index) of the netObject
+	 */
+	protected void removeNetObject(int id) {
+		removeQueue.add(id);
+	}
+	
+	/**
 	 * the runnable for input operations
 	 */
 	private Runnable inRunnable = new Runnable() {
@@ -191,7 +242,6 @@ public class NetHandle {
 						Mouse.runOnMove(mousePos.x == -1 ? 0 : x-mousePos.x, mousePos.y == -1 ? 0 : y-mousePos.y, playerID);
 						mousePos.x = x;
 						mousePos.y = y;
-						System.out.println(mousePos);
 					} else if(command == NetCommands.MOUSE_ENTER) {
 						Mouse.runOnEnter(playerID);
 					} else if(command == NetCommands.MOUSE_EXIT) {

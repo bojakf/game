@@ -42,6 +42,7 @@ public class Mouse {
 	/*
 	 * TODO fix setCursorPos
 	 * TODO fix setCursorMode
+	 * FIXME mouse pos 0, 0 when leaving the window use last position
 	 */
 	
 	/**

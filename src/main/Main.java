@@ -308,5 +308,13 @@ public class Main {
         glfwDestroyWindow(window);
         
 	}
+	
+	/**
+	 * Returns the id of the current opengl window
+	 * @return the id of the window
+	 */
+	public long getWindowID() {
+		return window;
+	}
 
 }

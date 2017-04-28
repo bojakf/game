@@ -5,8 +5,9 @@ import static org.lwjgl.opengl.GL11.*;
 import java.io.Serializable;
 
 import main.Game;
+import network.NetObject;
 
-public abstract class Collider implements Serializable {
+public abstract class Collider implements Serializable, NetObject {
 
 	/**
 	 * 
@@ -129,10 +130,7 @@ public abstract class Collider implements Serializable {
 		pendingDestroy = true;
 	}
 	
-	/**
-	 * is the collider queued for deletion 
-	 * @return pendingDestroy
-	 */
+	@Override
 	public final boolean isPendingDestroy() {
 		return pendingDestroy;
 	}

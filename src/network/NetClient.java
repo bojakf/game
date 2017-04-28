@@ -274,10 +274,8 @@ public class NetClient {
 					} else if(command == NetCommands.ADD_OBJECT) {
 						Game.net.addNetObject((NetObject) in.readObject());
 					} else if(command == NetCommands.ADD_PLAYER) {
-						
 						NetPlayer p = (NetPlayer) in.readObject();
 						Game.net.addNetPlayer(p);
-						
 					} else if(command == NetCommands.UPDATE_OBJECT) {
 						
 						int id = in.readInt();
@@ -289,6 +287,15 @@ public class NetClient {
 						}
 						
 						Game.net.netObjects.get(id).receiveNetUpdate(data);
+						
+					} else if(command == NetCommands.REMOVE_OBJECT) {
+						
+						int id = in.readInt();
+						NetObject obj = Game.net.netObjects.get(id);
+						if(obj instanceof NetPlayer) {
+							Game.net.netPlayers.remove(obj);
+						}
+						Game.net.netObjects.remove(id);
 						
 					}
 					

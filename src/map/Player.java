@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import input.Keyboard;
-import input.Keyboard.CharListener;
 import input.Keyboard.KeyListener;
 import input.Mouse;
 import input.Mouse.MouseListener;
@@ -31,6 +30,10 @@ import physics.Vector;
  */
 public class Player extends Collider implements NetPlayer {
 
+	/*
+	 * TODO animate player
+	 */
+	
 	/**
 	 * 
 	 */
@@ -132,7 +135,9 @@ public class Player extends Collider implements NetPlayer {
 			dir.y = -(mp.y / Game.QUAD_SIZE - origin.y);
 			dir.normalize();
 			
-			RaycastHit hit = Physics.raycast(new Ray(origin, dir), Physics.LAYER_PLAYER);
+			ArrayList<Collider> ignore = new ArrayList<>();
+			ignore.add(this);
+			RaycastHit hit = Physics.raycast(new Ray(origin, dir), Physics.LAYER_DEFAULT | Physics.RAYCAST_ALL, ignore);
 			
 			laserStart = origin;
 			if(hit != null) {
@@ -144,8 +149,6 @@ public class Player extends Collider implements NetPlayer {
 				dir.add(origin);
 				laserEnd = dir;
 			}
-			
-			if(playerID != 0)System.out.println();
 			
 		}
 		

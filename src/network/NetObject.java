@@ -27,4 +27,9 @@ public interface NetObject extends Serializable {
 	 */
 	public void update(double deltaTime);
 	
+	/**
+	 * Is the object queued for destruction
+	 */
+	public boolean isPendingDestroy();
+	
 }

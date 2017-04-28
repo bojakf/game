@@ -9,6 +9,8 @@ import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.ARBVertexShader;
 import org.lwjgl.opengl.GL11;
 
+import main.Game;
+
 /**
  * 
  * Used to upload a shader from file to GPU
@@ -28,8 +30,8 @@ public class ShaderLoader {
 	/**
 	 * Uploads a shader to the gpu
 	 * and prints shader debug information
-	 * @param vertexShaderName the location of the vertex shader
-	 * @param fragmentShaderName the location of the fragment shader
+	 * @param vertexShaderName the location of the vertex shader relative to Game.gamePath
+	 * @param fragmentShaderName the location of the fragment shader relative to Game.gamePath
 	 * @return the id of the shader object
 	 */
 	public static int loadShader(String vertexShaderName, String fragmentShaderName) {
@@ -39,8 +41,8 @@ public class ShaderLoader {
 		int fragmentShader = 0;
 		
 		try {
-			vertexShader = createShader(vertexShaderName, ARBVertexShader.GL_VERTEX_SHADER_ARB);
-			fragmentShader = createShader(fragmentShaderName, ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
+			vertexShader = createShader(Game.gamePath + vertexShaderName, ARBVertexShader.GL_VERTEX_SHADER_ARB);
+			fragmentShader = createShader(Game.gamePath + fragmentShaderName, ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return 0;
