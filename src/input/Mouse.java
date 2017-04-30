@@ -39,6 +39,11 @@ import physics.Vector;
  */
 public class Mouse {
 
+	/**
+	 * use this as player id for local input
+	 */
+	public static final int LOCAL = Integer.MIN_VALUE;
+	
 	/*
 	 * TODO fix setCursorPos
 	 * TODO fix setCursorMode
@@ -113,7 +118,14 @@ public class Mouse {
 			@Override
 			public void invoke(long window, double x, double y) {
 				
-				ArrayList<MouseMotionListener> mmls = mouseMotionListeners.get(Game.net.playerID);
+				ArrayList<MouseMotionListener> mmls = null;
+				if(Game.net != null) mmls = mouseMotionListeners.get(Game.net.playerID);
+				if(mmls == null) 
+					mmls = mouseMotionListeners.get(Mouse.LOCAL);
+				else {
+					ArrayList<MouseMotionListener> a = mouseMotionListeners.get(Mouse.LOCAL);
+					if(a != null) mmls.addAll(a);
+				}
 				if(mmls == null) return;
 				
 				for (MouseMotionListener mm : mmls) {
@@ -130,7 +142,14 @@ public class Mouse {
 			@Override
 			public void invoke(long window, int entered) {
 				
-				ArrayList<MouseMotionListener> mmls = mouseMotionListeners.get(Game.net.playerID);
+				ArrayList<MouseMotionListener> mmls = null;
+				if(Game.net != null) mmls = mouseMotionListeners.get(Game.net.playerID);
+				if(mmls == null) 
+					mmls = mouseMotionListeners.get(Mouse.LOCAL);
+				else {
+					ArrayList<MouseMotionListener> a = mouseMotionListeners.get(Mouse.LOCAL);
+					if(a != null) mmls.addAll(a);
+				}
 				if(mmls == null) return;
 				
 				if(entered == 0) {
@@ -157,7 +176,12 @@ public class Mouse {
 			@Override
 			public void invoke(long window, int button, int action, int mods) {
 				
-				ArrayList<MouseListener> mbls = mouseButtonListeners.get(Game.net.playerID);
+				ArrayList<MouseListener> mbls = null;
+				if(Game.net != null) mbls = mouseButtonListeners.get(Game.net.playerID);
+				if(mbls == null) 
+					mbls = mouseButtonListeners.get(Mouse.LOCAL);
+				else
+					mbls.addAll(mouseButtonListeners.get(Mouse.LOCAL));
 				if(mbls == null) return;
 				
 				if(action == GLFW_PRESS) {
@@ -187,7 +211,14 @@ public class Mouse {
 				 * xMove not available at standard mouses
 				 */
 				
-				ArrayList<MouseListener> mbls = mouseButtonListeners.get(Game.net.playerID);
+				ArrayList<MouseListener> mbls = null;
+				if(Game.net != null) mbls = mouseButtonListeners.get(Game.net.playerID);
+				if(mbls == null) 
+					mbls = mouseButtonListeners.get(Mouse.LOCAL);
+				else {
+					ArrayList<MouseListener> a = mouseButtonListeners.get(Mouse.LOCAL);
+					if(a != null) mbls.addAll(a);
+				}
 				if(mbls == null) return;
 				
 				for(MouseListener mb : mbls) {
@@ -219,12 +250,12 @@ public class Mouse {
 	
 	/**
 	 * Returns the x position of the Mouse relative to the window for the given player
-	 * @param playerID the id of the player who's input should by used
+	 * @param playerID the id of the player who's input should by used<br>use Mouse.LOCAL for local input
 	 * @return the x position of the Mouse relative to the window
 	 */
 	public static double x(int playerID) {
 		
-		if(playerID == Game.net.playerID) {
+		if(playerID == Mouse.LOCAL || playerID == Game.net.playerID) {
 			DoubleBuffer xPos = BufferUtils.createDoubleBuffer(1), yPos = BufferUtils.createDoubleBuffer(1);
 			glfwGetCursorPos(window, xPos, yPos);
 			return xPos.get(0);
@@ -238,12 +269,12 @@ public class Mouse {
 	
 	/**
 	 * Returns the y position of the Mouse relative to the window for the given player
-	 * @param playerID the id of the player who's input should by used
+	 * @param playerID the id of the player who's input should by used<br>use Mouse.LOCAL for local input
 	 * @return the y position of the Mouse relative to the window
 	 */
 	public static double y(int playerID) {
 		
-		if(playerID == Game.net.playerID) {
+		if(playerID == Mouse.LOCAL || playerID == Game.net.playerID) {
 			DoubleBuffer xPos = BufferUtils.createDoubleBuffer(1), yPos = BufferUtils.createDoubleBuffer(1);
 			glfwGetCursorPos(window, xPos, yPos);
 			return Main.windowHeight - yPos.get(0);
@@ -257,12 +288,12 @@ public class Mouse {
 	
 	/**
 	 * Returns the xy position of the Mouse relative to the window for the given player
-	 * @param playerID the id of the player who's input should by used
+	 * @param playerID the id of the player who's input should by used<br>use Mouse.LOCAL for local input
 	 * @return the xy position of the Mouse relative to the window
 	 */
 	public static Vector xy(int playerID) {
 		
-		if(playerID == Game.net.playerID) {
+		if(playerID == Mouse.LOCAL || playerID == Game.net.playerID) {
 			DoubleBuffer xPos = BufferUtils.createDoubleBuffer(1), yPos = BufferUtils.createDoubleBuffer(1);
 			glfwGetCursorPos(window, xPos, yPos);
 			return new Vector(xPos.get(0), Main.windowHeight - yPos.get(0));
@@ -278,21 +309,22 @@ public class Mouse {
 	 * Sets the position of the mouse for the given player
 	 * @param x the new x position of the mouse
 	 * @param y the new y position of the mouse
-	 * @param playerID the id of the player who's mouse should be moved
+	 * @param playerID the id of the player who's mouse should be moved<br>use Mouse.LOCAL for local input
 	 */
 	@Deprecated
 	public static void setCursorPos(double x, double y, int playerID) {
+		//TODO implement Mouse.LOCAL
 		glfwSetCursorPos(window, x, y);
 	}
 	
 	/**
 	 * Sets the visibility mode of the cursor (disabled, hidden, normal)
 	 * @param cm the new mode of the cursor
-	 * @param playerID the id of the player who's mouse should be modified
+	 * @param playerID the id of the player who's mouse should be modified<br>use Mouse.LOCAL for local input
 	 */
 	@Deprecated
 	public static void setCursorMode(CursorMode cm, int playerID) {
-		
+		//TODO implement Mouse.LOCAL
 		if(cm == CursorMode.disabled) {
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		} else if(cm == CursorMode.hidden) {
@@ -395,7 +427,7 @@ public class Mouse {
 	/**
 	 * Adds a mouse motion listener for the given player
 	 * @param mm the mouse motion listener
-	 * @param playerID the id of the player
+	 * @param playerID the id of the player<br>use Mouse.LOCAL for local input
 	 */
 	public static void addMouseMotionListener(MouseMotionListener mm, int playerID) {
 		if(mouseMotionListeners.containsKey(playerID)) {
@@ -410,7 +442,7 @@ public class Mouse {
 	/**
 	 * Adds a mouse button listener for the given player
 	 * @param mb the mouse button listener
-	 * @param playerID the id of the player
+	 * @param playerID the id of the player<br>use Mouse.LOCAL for local input
 	 */
 	public static void addMouseButtonListener(MouseListener mb, int playerID) {
 		if(mouseButtonListeners.containsKey(playerID)) {
@@ -425,7 +457,7 @@ public class Mouse {
 	/**
 	 * Removes the given mouse motion listener for the given player
 	 * @param mm the mouse motion listener
-	 * @param playerID the id of the player
+	 * @param playerID the id of the player<br>use Mouse.LOCAL for local input
 	 * @return did the listener get removed<br>Also returns false if the listener was not found
 	 */
 	public static boolean removeMouseMotionListener(MouseMotionListener mm, int playerID) {
@@ -436,7 +468,7 @@ public class Mouse {
 	/**
 	 * Removes the given mouse button listener for the given player
 	 * @param mb the mouse button listener
-	 * @param playerID the id of the player
+	 * @param playerID the id of the player<br>use Mouse.LOCAL for local input
 	 * @return did the listener get removed<br>Also returns false if the listener was not found
 	 */
 	public static boolean removeMouseButtonListener(MouseListener mb, int playerID) {

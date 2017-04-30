@@ -44,6 +44,11 @@ public class Network {
 	public static final double SYNC_RATE = 60;
 	
 	/**
+	 * The default port of the server
+	 */
+	public static final int DEFAULT_PORT = 25565;
+	
+	/**
 	 * The id of the local player
 	 */
 	public final int playerID;

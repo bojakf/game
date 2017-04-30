@@ -18,6 +18,7 @@ import map.Map;
 import map.Player;
 import network.Network;
 import physics.Physics;
+import rendering.AnimatedTexture;
 
 /**
  * 
@@ -92,6 +93,11 @@ public class Game {
 	public static String gamePath;
 	
 	/**
+	 * The animation for the player
+	 */
+	public static AnimatedTexture playerTex;
+	
+	/**
 	 * The currently shown level
 	 */
 	private static Level curLevel;
@@ -138,18 +144,26 @@ public class Game {
 		 * Load textures
 		 */
 		
+		if(playerTex == null) {
+			playerTex = new AnimatedTexture("textures\\player", 6);
+		}
+		
 		TexManager.loadTex("grass", gamePath + "textures\\grass.jpg");
 		TexManager.loadTex("wall", gamePath + "textures\\wall.png");
 		TexManager.loadTex("player", gamePath + "textures\\player.gif");
+		TexManager.loadTex("button_normal", gamePath + "textures\\button_normal.png");
+		TexManager.loadTex("button_mouseOver", gamePath + "textures\\button_mouseOver.png");
+		TexManager.loadTex("button_clicked", gamePath + "textures\\button_clicked.png");
+		TexManager.loadTex("ascii", gamePath + "textures\\ascii.png");
 		
-		try {
-			new ServerSocket(25565).close();
-			curLevel = new OnlineGame(25565);
-		} catch(Exception e) {
-			curLevel = new OnlineGame(InetAddress.getLoopbackAddress(), 25565);
-		}
+//		try {
+//			new ServerSocket(25565).close();
+//			curLevel = new OnlineGame(25565);
+//		} catch(Exception e) {
+//			curLevel = new OnlineGame(InetAddress.getLoopbackAddress(), 25565);
+//		}
 		
-		//curLevel = new MainMenu();
+		curLevel = new MainMenu();
 		
 	}
 	
@@ -157,7 +171,7 @@ public class Game {
 	 * Changes the level. Calls onClose on the removed level
 	 * @param lvl the new level
 	 */
-	public void changeLevel(Level lvl) {
+	public static void changeLevel(Level lvl) {
 		curLevel.onClose();
 		curLevel = lvl;
 	}
@@ -190,7 +204,7 @@ public class Game {
 	 * called when the mainLoop ended
 	 */
 	protected void onClose() {
-		net.close();
+		if(net != null) net.close();
 	}
 	
 }

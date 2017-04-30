@@ -210,6 +210,7 @@ public class Physics {
 	 */
 	public static void drawColliders() {
 		
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		glLineWidth(4f);
 		GL11.glTranslated(0, 0, -10);
 		
@@ -218,6 +219,7 @@ public class Physics {
 		}
 		
 		GL11.glTranslated(0, 0, 10);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 	}
 	

@@ -16,6 +16,7 @@ import loading.TexManager;
 import main.Game;
 import network.NetPlayer;
 import physics.Collider;
+import physics.Damagable;
 import physics.Physics;
 import physics.Ray;
 import physics.RaycastHit;
@@ -28,7 +29,7 @@ import physics.Vector;
  * @author jafi2
  *
  */
-public class Player extends Collider implements NetPlayer {
+public class Player extends Damagable implements NetPlayer {
 
 	/*
 	 * TODO animate player
@@ -39,6 +40,16 @@ public class Player extends Collider implements NetPlayer {
 	 */
 	private static final long serialVersionUID = -5203099848561064804L;
 
+	/**
+	 * The number of health points the player starts with
+	 */
+	private static final double INITIAL_HEALTH = 200;
+	
+	/**
+	 * The damage the laser does per second
+	 */
+	private static final double LASER_DPS = 20;
+	
 	/**
 	 * The maximum speed of the player
 	 */
@@ -77,7 +88,7 @@ public class Player extends Collider implements NetPlayer {
 	 */
 	public Player(int playerID) {
 		
-		super(new Vector(10, 10), new Vector(1, 1), new Vector(), Physics.LAYER_PLAYER);
+		super(new Vector(10, 10), new Vector(1, 1), new Vector(), Physics.LAYER_PLAYER, INITIAL_HEALTH);
 		isBlocking = true;
 		
 		this.playerID = playerID;
@@ -103,6 +114,8 @@ public class Player extends Collider implements NetPlayer {
 	}
 	
 	public void update(double deltaTime) {
+		
+		Game.playerTex.update(deltaTime);
 		
 		if(Keyboard.isKeyDown(GLFW.GLFW_KEY_W, playerID)) {
 			velocity.y = 1;
@@ -141,6 +154,9 @@ public class Player extends Collider implements NetPlayer {
 			
 			laserStart = origin;
 			if(hit != null) {
+				if(hit.hit instanceof Damagable) {
+					((Damagable)hit.hit).damage(LASER_DPS * deltaTime);
+				}
 				laserEnd = hit.pos;
 			} else {
 				dir.x = -dir.x;
@@ -152,6 +168,8 @@ public class Player extends Collider implements NetPlayer {
 			
 		}
 		
+		System.out.println(hp);
+		
 	}
 	
 	public void render() {
@@ -159,10 +177,12 @@ public class Player extends Collider implements NetPlayer {
 		glTranslated(0, 0, -0.5d);
 		
 		TexManager.bindTex("player");
+		Game.playerTex.bindCur();
 		
 		if(laserOn && laserStart != null && laserEnd != null) {
 			
 			glColor3d(1, 1, 0);
+			glDisable(GL_TEXTURE_2D);
 			
 			glBegin(GL_LINES);
 			
@@ -170,6 +190,7 @@ public class Player extends Collider implements NetPlayer {
 			glVertex2d(laserEnd.x * Game.QUAD_SIZE, laserEnd.y * Game.QUAD_SIZE);
 			
 			glEnd();
+			glEnable(GL_TEXTURE_2D);
 			
 		}
 		
@@ -216,6 +237,7 @@ public class Player extends Collider implements NetPlayer {
 		data.add(laserStart);
 		data.add(laserEnd);
 		data.add(laserOn);
+		data.add(hp);
 	}
 
 	@Override
@@ -226,6 +248,7 @@ public class Player extends Collider implements NetPlayer {
 		laserStart = (Vector) data.get(3);
 		laserEnd = (Vector) data.get(4);
 		laserOn = (boolean) data.get(5);
+		hp = (double) data.get(6);
 	}
 
 	@Override

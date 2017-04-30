@@ -26,6 +26,11 @@ import main.Game;
 public class Keyboard {
 	
 	/**
+	 * use this as player id for local input
+	 */
+	public static final int LOCAL = Integer.MIN_VALUE;
+	
+	/**
 	 * This class contains only static methods
 	 */
 	private Keyboard() {}
@@ -85,7 +90,14 @@ public class Keyboard {
 			@Override
 			public void invoke(long window, int key, int scancode, int action, int mods) {
 				
-				ArrayList<KeyListener> kls = keyListeners.get(Game.net.playerID);
+				ArrayList<KeyListener> kls = null;
+				if(Game.net != null) kls = keyListeners.get(Game.net.playerID);
+				if(kls == null)
+					kls = keyListeners.get(LOCAL);
+				else {
+					ArrayList<KeyListener> a = keyListeners.get(LOCAL);
+					if(a != null) kls.addAll(a);
+				}
 				if(kls == null) return;
 				
 				if(action == GLFW_PRESS) {
@@ -128,8 +140,16 @@ public class Keyboard {
 				
 				char input[] = Character.toChars(codePoint);
 				
-				ArrayList<CharListener> cls = charListeners.get(Game.net.playerID);
+				ArrayList<CharListener> cls = null;
+				if(Game.net != null) cls = charListeners.get(Game.net.playerID);
+				if(cls == null)
+					cls = charListeners.get(LOCAL);
+				else {
+					ArrayList<CharListener> a = charListeners.get(LOCAL);
+					if(a != null) cls.addAll(a);
+				}
 				if(cls == null) return;
+				
 				for(CharListener cl : cls) {
 					cl.onChar(input[0]);
 				}
@@ -143,11 +163,11 @@ public class Keyboard {
 	 * Is the given key down for the given player<br>
 	 * If the playerID equals Game.net.playerID the local input is check otherwise the input is received through network
 	 * @param key GLFW.GLFW_KEY_Keyname
-	 * @param playerID the id of player who's input should be used
+	 * @param playerID the id of player who's input should be used<br>use Mouse.LOCAL for local input
 	 * @return is the key down?
 	 */
 	public static boolean isKeyDown(int key, int playerID) {
-		if(playerID == Game.net.playerID) {
+		if(playerID == LOCAL || playerID == Game.net.playerID) {
 			return GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS;
 		} else {
 			HashMap<Integer, Integer> keyStates = Game.net.getKeyStates(playerID);
@@ -226,7 +246,7 @@ public class Keyboard {
 	/**
 	 * Adds a key listener to the keyboard
 	 * @param kl the key listener
-	 * @param playerID the id of the player who's input should be used
+	 * @param playerID the id of the player who's input should be used<br>use Mouse.LOCAL for local input
 	 */
 	public static void addKeyListener(KeyListener kl, int playerID) {
 		if(keyListeners.containsKey(playerID)) {
@@ -241,7 +261,7 @@ public class Keyboard {
 	/**
 	 * Adds a char listener to the keyboard
 	 * @param cl the char listener
-	 * @param playerID the id of the player who's input should be used
+	 * @param playerID the id of the player who's input should be used<br>use Mouse.LOCAL for local input
 	 */
 	public static void addCharListener(CharListener cl, int playerID) {
 		if(charListeners.containsKey(playerID)) {
@@ -256,7 +276,7 @@ public class Keyboard {
 	/**
 	 * Removes the given key Listener from the keyboard
 	 * @param kl the key listener to remove
-	 * @param playerID the id of the player who's listener should be removed
+	 * @param playerID the id of the player who's listener should be removed<br>use Mouse.LOCAL for local input
 	 * @return did the listener get removed <br>Also returns false if the key listener was not found
 	 */
 	public static boolean removeKeyListener(KeyListener kl, int playerID) {
@@ -267,7 +287,7 @@ public class Keyboard {
 	/**
 	 * Removes the given char Listener from the keyboard
 	 * @param cl the char listener
-	 * @param playerID the id of the player who's listener should be removed
+	 * @param playerID the id of the player who's listener should be removed<br>use Mouse.LOCAL for local input
 	 * @return did the listener get removed <br>Also returns false if the key listener was not found
 	 */
 	public static boolean removeCharListener(CharListener cl, int playerID) {

@@ -9,6 +9,13 @@ import map.Player;
 import network.Network;
 import physics.Physics;
 
+/**
+ * 
+ * This is the the level for online Games
+ * 
+ * @author jafi2
+ *
+ */
 public class OnlineGame extends Level {
 
 	/**

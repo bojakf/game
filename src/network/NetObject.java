@@ -29,6 +29,7 @@ public interface NetObject extends Serializable {
 	
 	/**
 	 * Is the object queued for destruction
+	 * @return is the object queued for destruction
 	 */
 	public boolean isPendingDestroy();
 	
