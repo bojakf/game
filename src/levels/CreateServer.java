@@ -99,8 +99,7 @@ public class CreateServer extends Level {
 
 	@Override
 	public void onClose() {
-	}	
-	
-	
+		ui.destroy();
+	}		
 	
 }

@@ -60,6 +60,11 @@ public class Map implements Serializable {
 			}
 		}
 		
+		Game.net.registerNetObject(new PlayerSpawn(new Vector(2, 2), 0));
+		Game.net.registerNetObject(new PlayerSpawn(new Vector(2, Game.QUADS_Y-3), 1));
+		Game.net.registerNetObject(new PlayerSpawn(new Vector((int)Game.QUADS_X-2, Game.QUADS_Y-3), 2));
+		Game.net.registerNetObject(new PlayerSpawn(new Vector((int)Game.QUADS_X-2, 2), 3));
+		
 	}
 	
 }

@@ -1,6 +1,7 @@
 package rendering;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import loading.TexManager;
@@ -12,19 +13,26 @@ import main.Game;
  * The textures must have the following file structure: [location]\[number of image].png<br>
  * The first textures has to have the name 1.png
  * 
+ * TODO don't make this class serializable
+ * 
  * @author jafi2
  *
  */
-public class AnimatedTexture {
+public class AnimatedTexture implements Cloneable, Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2726605042539336824L;
+	
 	/**
 	 * Value for animation timing
 	 */
-	private double animationTimer = 0;
+	public double animationTimer = 0;
 	/**
 	 * The current texture
 	 */
-	private int curTex = 0;
+	public int curTex = 0;
 	/**
 	 * The textures
 	 */
@@ -82,6 +90,16 @@ public class AnimatedTexture {
 	 */
 	public void bindCur() {
 		TexManager.bindTex(texNames[curTex]);
+	}
+	
+	@Override
+	public AnimatedTexture clone() {
+		try {
+			return (AnimatedTexture)super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 }

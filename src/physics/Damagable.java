@@ -39,7 +39,7 @@ public abstract class Damagable extends Collider {
 	 */
 	public final boolean damage(double dmg) {
 		hp -= dmg;
-		if(hp < 0) {
+		if(hp <= 0) {
 			destroy();
 			return true;
 		}

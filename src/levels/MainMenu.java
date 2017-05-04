@@ -70,6 +70,7 @@ public class MainMenu extends Level {
 
 	@Override
 	public void onClose() {
+		ui.destroy();
 	}
 
 }

@@ -24,7 +24,7 @@ public abstract class Collider implements Serializable, NetObject {
 	/**
 	 * Did the physics thread remove the collider
 	 */
-	private boolean pendingDestroy = false;
+	protected boolean pendingDestroy = false;
 	
 	/**
 	 * position of the collider
@@ -79,7 +79,7 @@ public abstract class Collider implements Serializable, NetObject {
 		this.velocity = velocity;
 		
 		this.layer = layer;
-		if(layer < 0 || layer >= Physics.LAYERS) {
+		if((layer & ~Physics.RAYCAST_IGNORE) < 0 || (layer & ~Physics.RAYCAST_IGNORE) >= Physics.LAYERS) {
 			new Exception("Invalid layer! Using DEFAULT").printStackTrace();
 			layer = Physics.LAYER_DEFAULT;
 		}
@@ -128,6 +128,7 @@ public abstract class Collider implements Serializable, NetObject {
 	 */
 	public final void destroy() {
 		pendingDestroy = true;
+		onDestroy();
 	}
 	
 	@Override
@@ -153,7 +154,7 @@ public abstract class Collider implements Serializable, NetObject {
 	public abstract void onCollision(Collider hit);
 	
 	/**
-	 * Called by physics thread when the collider gets removed
+	 * Called directly after the object is queued for destruction
 	 */
 	protected abstract void onDestroy();
 	

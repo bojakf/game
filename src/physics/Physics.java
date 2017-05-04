@@ -18,7 +18,7 @@ public class Physics {
 	/*
 	 * Number of available layers
 	 */
-	public static final int LAYERS = 4;
+	public static final int LAYERS = 5;
 	
 	/**
 	 * default physical layer <br>will sometimes automatically replace invalid layers
@@ -43,6 +43,12 @@ public class Physics {
 	 * it can be used with bitwise or on the layer
 	 */
 	public static final int RAYCAST_ALL = 0x80000000;
+	/**
+	 * This value is intended for raycasting in order ignore the object which has this bit
+	 * set. It does not affect other collisions. Use it bitwise or on the layer of the collider
+	 */
+	public static final int RAYCAST_IGNORE = 0x40000000;
+	
 	
 	/**
 	 * Placeholder for collisionMatrix
@@ -54,7 +60,7 @@ public class Physics {
 	private static boolean collisionMatrix[][] = new boolean[][] {
 					//Default	Player	Enemy	World
 		/*Default*/	{true,		true,	true,	true},
-		/*Player*/	{NONE,		false,	true,	true},
+		/*Player*/	{NONE,		false,	false,	true},
 		/*Enemy*/	{NONE,		NONE,	false,	true},
 		/*World*/	{NONE,		NONE,	NONE,	false},
 	};
@@ -104,7 +110,7 @@ public class Physics {
 		for(int a = 0; a < colliders.size(); a++) {
 			
 			if(colliders.get(a).isPendingDestroy()) {
-				colliders.remove(a).onDestroy();
+				colliders.remove(a);
 				a--;
 				continue;
 			}
@@ -365,6 +371,8 @@ public class Physics {
 			
 			if(!_canCollide(col.layer, layer)) continue;
 			
+			if((col.layer & RAYCAST_IGNORE) != 0) continue;
+			
 			if(ignore.contains(col)) continue;
 			
 			Vector min = new Vector(col.pos.x, col.pos.y);
@@ -436,6 +444,48 @@ public class Physics {
 	}
 	
 	/**
+	 * Get all colliders interfering the circle
+	 * @param pos the position of the circle
+	 * @param radius the radius of the circle
+	 * @return list of colliders interfering with the circle
+	 */
+	public static ArrayList<Collider> checkCircle(Vector pos, double radius) {
+		
+		ArrayList<Collider> r = new ArrayList<>();
+		
+		for(int i = 0; i < colliders.size(); i++) {
+			
+			Collider c = colliders.get(i);
+			
+			Vector p1 = new Vector(c.pos.x - pos.x, c.pos.y - pos.y);
+			Vector p2 = new Vector(c.pos.x + c.size.x - pos.x, c.pos.y + c.size.y - pos.y);
+			Vector p3 = new Vector(p2.x, p1.y);
+			Vector p4 = new Vector(p1.x, p2.y);
+			
+			if(p1.length() <= radius) {
+				r.add(c);
+				continue;
+			}
+			if(p2.length() <= radius) {
+				r.add(c);
+				continue;
+			}
+			if(p3.length() <= radius) {
+				r.add(c);
+				continue;
+			}
+			if(p4.length() <= radius) {
+				r.add(c);
+				continue;
+			}
+			
+		}
+		
+		return r;
+		
+	}
+	
+	/**
 	 * Check if this layers can collide
 	 * @param layer1 first layer
 	 * @param layer2 second layer
@@ -459,6 +509,9 @@ public class Physics {
 	 * @return can they collide?
 	 */
 	private static boolean _canCollide(int layer1, int layer2) {
+		
+		layer1 &= ~RAYCAST_IGNORE;
+		layer2 &= ~RAYCAST_IGNORE;
 		
 		if(layer2 < layer1) {
 			int tmp = layer1;

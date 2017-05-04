@@ -1,21 +1,12 @@
 package main;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
-
-import javax.swing.JOptionPane;
 
 import debug.Debug;
 import levels.Level;
 import levels.MainMenu;
-import levels.OnlineGame;
 import loading.TexManager;
-import map.Map;
-import map.Player;
 import network.Network;
 import physics.Physics;
 import rendering.AnimatedTexture;
@@ -30,10 +21,7 @@ import rendering.AnimatedTexture;
  */
 
 public class Game {
-
-	/*
-	 * TODO create Physics Thread in Network
-	 */
+	
 	/*
 	 * TODO add option to disable vsync
 	 */
@@ -103,11 +91,6 @@ public class Game {
 	private static Level curLevel;
 	
 	/**
-	 * The Thread calculating physics
-	 */
-	private Thread physicsThread;
-	
-	/**
 	 * Create the game
 	 * There may be only one instance of this class
 	 */
@@ -150,18 +133,12 @@ public class Game {
 		
 		TexManager.loadTex("grass", gamePath + "textures\\grass.jpg");
 		TexManager.loadTex("wall", gamePath + "textures\\wall.png");
-		TexManager.loadTex("player", gamePath + "textures\\player.gif");
 		TexManager.loadTex("button_normal", gamePath + "textures\\button_normal.png");
 		TexManager.loadTex("button_mouseOver", gamePath + "textures\\button_mouseOver.png");
 		TexManager.loadTex("button_clicked", gamePath + "textures\\button_clicked.png");
 		TexManager.loadTex("ascii", gamePath + "textures\\ascii.png");
-		
-//		try {
-//			new ServerSocket(25565).close();
-//			curLevel = new OnlineGame(25565);
-//		} catch(Exception e) {
-//			curLevel = new OnlineGame(InetAddress.getLoopbackAddress(), 25565);
-//		}
+		TexManager.loadTex("playerSpawn", gamePath + "textures\\playerSpawn.png");
+		TexManager.loadTex("grenade", gamePath + "textures\\grenade.png");
 		
 		curLevel = new MainMenu();
 		

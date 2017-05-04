@@ -91,6 +91,7 @@ public class Ui {
 	
 	/**
 	 * Is the Mouse button down
+	 * TODO do this in Mouse class
 	 * @param button the number of the mouse button
 	 * @return is the mouse button down
 	 */
@@ -115,6 +116,12 @@ public class Ui {
 		for(int i = 0; i < uiObjects.size(); i++) {
 			uiObjects.get(i).onDestroy();
 		}
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		destroy();
+		super.finalize();
 	}
 	
 }

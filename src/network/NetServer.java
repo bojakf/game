@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import main.Game;
-import map.Player;
+import player.Player;
 
 /**
  * 

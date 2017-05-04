@@ -5,9 +5,9 @@ import java.net.InetAddress;
 import main.Game;
 import main.Main;
 import map.Map;
-import map.Player;
 import network.Network;
 import physics.Physics;
+import player.Player;
 
 /**
  * 

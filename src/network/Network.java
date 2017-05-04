@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import main.Game;
+import map.PlayerSpawn;
 import physics.Vector;
+import player.Player;
 
 /**
  * 
@@ -137,8 +139,8 @@ public class Network {
 			if(netObjects.get(i).isPendingDestroy()) {
 				for(int a = 0; a < server.handles.size(); a++) {
 					server.handles.get(a).removeNetObject(i);
-					netObjects.remove(i);
 				}
+				netObjects.remove(i);
 				i--;
 				continue;
 			}
@@ -168,6 +170,7 @@ public class Network {
 	
 	/**
 	 * Called by the server in order to add a netPlayer<br>
+	 * Also spawns the player at his spawnpoint if there is one<br>
 	 * Clients are not allowed to call this method
 	 * @param obj the netPlayer to add
 	 */
@@ -176,6 +179,18 @@ public class Network {
 		if(isClient()) {
 			new Exception("Clients cannot register objects").printStackTrace();
 			return;
+		}
+		
+		/*
+		 * TODO improve this
+		 */
+		for(int i = 0; i < netObjects.size(); i++) {
+			NetObject c = netObjects.get(i);
+			if(c instanceof PlayerSpawn && 
+					((PlayerSpawn)c).getPlayerID() == obj.getPlayerID()) {
+				((Player)obj).setPosition(((PlayerSpawn) c).getPosition());
+				((Player)obj).spawn = (PlayerSpawn)c;
+			}
 		}
 		
 		for(int i = 0; i < server.handles.size(); i++) {
