@@ -42,24 +42,15 @@ public class NetHandle {
 	/**
 	 * Client socket
 	 */
-	private Socket client;
+	protected Socket client;
 	/**
 	 * the output stream to the client
 	 */
-	private ObjectOutputStream out;
+	protected ObjectOutputStream out;
 	/**
 	 * the input stream from the client
 	 */
-	private ObjectInputStream in;
-	
-	/**
-	 * Contains the objects queued for sending to the client
-	 */
-	private ArrayList<NetObject> sendQueue = new ArrayList<>();
-	/**
-	 * Contains all objects queued for removal
-	 */
-	private ArrayList<Integer> removeQueue = new ArrayList<>();
+	protected ObjectInputStream in;
 	
 	/**
 	 * the id of the player this client represents
@@ -84,9 +75,7 @@ public class NetHandle {
 		this.client = client;
 		this.out = out;
 		this.in = in;
-		outThread = new Thread(outRunnable, "Client " + playerID + " out");
 		inThread = new Thread(inRunnable, "Client " + playerID + " in");
-		sendQueue.clear();
 		outThread.start();
 		inThread.start();
 	}
@@ -96,117 +85,6 @@ public class NetHandle {
 	 */
 	public void close() {
 		stop = true;
-	}
-	
-	/**
-	 * The runnable for output operations
-	 */
-	private Runnable outRunnable = new Runnable() {
-		
-		@Override
-		public void run() {
-			
-			double last = System.nanoTime();
-			
-			while(!stop) {
-				
-				double now = System.nanoTime();
-				double deltaTime = (now-last)/1000000000d;
-					
-				if(1/deltaTime > Network.SYNC_RATE) {
-					double sleepTime = (1/Network.SYNC_RATE - deltaTime)*1000;
-					try {
-						Thread.sleep((long) sleepTime);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					now = System.nanoTime();
-					deltaTime = (now-last)/1000000000d;
-				}
-				last = now;
-				
-				try {
-					
-					/*
-					 * remove objects
-					 */
-					while(removeQueue.size() > 0) {
-						out.writeByte(NetCommands.REMOVE_OBJECT);
-						out.writeInt(removeQueue.remove(0));
-					}
-					
-					/*
-					 * send new objects to client 
-					 */
-					while(sendQueue.size() > 0) {
-						
-						NetObject obj = sendQueue.remove(0);
-						if(obj instanceof NetPlayer)
-							out.writeByte(NetCommands.ADD_PLAYER);
-						else 
-							out.writeByte(NetCommands.ADD_OBJECT);
-						out.writeObject(obj);
-					}
-					
-					/*
-					 * send updates for already existing objects to client 
-					 */
-					for(int i = 0; i < Game.net.netObjects.size(); i++) {
-						
-						ArrayList<Serializable> data = new ArrayList<>();
-						Game.net.netObjects.get(i).sendNetUpdate(data);
-						
-						out.writeByte(NetCommands.UPDATE_OBJECT);
-						out.writeInt(i);
-						out.writeInt(data.size());
-						
-						for(int a = 0; a < data.size(); a++) {
-							out.writeObject(data.get(a));
-						}
-						
-					}
-					
-					/*
-					 * Reset output stream in order to prevent
-					 * referencing already sent objects
-					 */
-					out.reset();
-					
-				} catch (IOException e) {
-					e.printStackTrace();
-					//FIXME don't handle exception like this
-					if(e instanceof SocketException) break;
-				}
-				
-			}
-			
-			try {
-				out.writeByte(NetCommands.DISCONNECT);
-				out.close();
-				in.close();
-				client.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-		}
-	};
-	
-	/**
-	 * Sends a new object to the client. The object must not be in the netObjects list before this method is called and the method must not be called 
-	 * with the same object twice.
-	 * @param obj the object
-	 */
-	protected void sendNetObject(NetObject obj) {
-		sendQueue.add(obj);
-	}
-	
-	/**
-	 * Removes a net object from the client. The object must be removed from netObjects list after this method was called
-	 * @param id the id(index) of the netObject
-	 */
-	protected void removeNetObject(int id) {
-		removeQueue.add(id);
 	}
 	
 	/**

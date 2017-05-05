@@ -16,6 +16,10 @@ import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.opengl.GL11.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL15;
@@ -23,6 +27,7 @@ import org.lwjgl.opengl.GLCapabilities;
 
 import input.Keyboard;
 import input.Mouse;
+import loading.MultiOutStream;
 import loading.TexManager;
 
 /**
@@ -64,6 +69,11 @@ public class Main {
 	public static boolean isClosing = false;
 	
 	/**
+	 * Is vSync currently active (must not be correct)
+	 */
+	public static boolean isVSync = true;
+	
+	/**
 	 * This is a reference to glCapabilities
 	 * <b>Warning: </b>this reference must not be deleted by the garbage collector before the application is closed. 
 	 * It contains necessary information in native code. OpenGL will not work without it.
@@ -78,8 +88,19 @@ public class Main {
 	/**
 	 * The main of the Game
 	 * @param args the arguments
+	 * @throws FileNotFoundException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
+		MultiOutStream err = new MultiOutStream();
+		MultiOutStream out = new MultiOutStream();
+		err.out.add(new FileOutputStream("errLog.txt"));
+		err.out.add(System.err);
+		out.out.add(new FileOutputStream("log.txt"));
+		out.out.add(System.out);
+		
+		System.setErr(new PrintStream(err, true));
+		System.setOut(new PrintStream(out, true));
+		
 		new Main();
 	}
 	
@@ -197,7 +218,9 @@ public class Main {
 		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//TODO this only allows transparent and not transparent nothing between
+		//FIXME this only allows transparent and not transparent nothing between
+		//FIXME fix this by rendering transparent textures before others (a layer system?)
+		//TODO add layer system
 		glEnable(GL_ALPHA_TEST);
 		glAlphaFunc(GL_GREATER, 0.9f);
 		

@@ -19,17 +19,13 @@ import player.Player;
 public class Network {
 	
 	/*
+	 * TODO rework networking (after component system)
+	 */
+	
+	/*
 	 * TODO do not update correct information compare with cloned objects
 	 * TODO bundle output to one thread (without initialization)
 	 * http://stackoverflow.com/questions/7987395/how-to-write-data-to-two-java-io-outputstream-objects-at-once
-	 */
-	
-	/*
-	 * TODO add client update for visuals
-	 */
-	
-	/*
-	 * ((TODO reduce CPU overhead))
 	 */
 	
 	/*
@@ -41,9 +37,13 @@ public class Network {
 	 */
 	
 	/**
+	 * Default number of Updates sent to the clients per second
+	 */
+	public static final double DEFAULT_SYNC_RATE = 60;
+	/**
 	 * Updates sent to the clients per second
 	 */
-	public static final double SYNC_RATE = 60;
+	public final double SYNC_RATE;
 	
 	/**
 	 * The default port of the server
@@ -76,12 +76,17 @@ public class Network {
 	/**
 	 * initializes Network
 	 * @param playerID the id of the local user, for server always 0
+	 * @param syncRate only for server. number of updates sent to clients per second
 	 */
-	private Network(int playerID) {
+	private Network(int playerID, double syncRate) {
 		this.playerID = playerID;
 		netObjects = new ArrayList<>();
 		netPlayers = new ArrayList<>();
+		SYNC_RATE = syncRate;
 	}
+	
+	
+	
 	
 	/**
 	 * creates a server
@@ -89,7 +94,17 @@ public class Network {
 	 * @return the Network object for interacting with the network
 	 */
 	public static Network createServer(int port) {
-		Network r = new Network(0);
+		return createServer(port, DEFAULT_SYNC_RATE);
+	}
+	
+	/**
+	 * creates a server
+	 * @param port the port of the server
+	 * @param syncRate the number of updates sent to clients per second.
+	 * @return the Network object for interacting with the network
+	 */
+	public static Network createServer(int port, double syncRate) {
+		Network r = new Network(0, syncRate);
 		r.server = new NetServer(port);
 		r.client = null;
 		return r;
@@ -103,7 +118,7 @@ public class Network {
 	 */
 	public static Network connectToServer(InetAddress address, int port) {
 		NetClient client = new NetClient(address, port);
-		Network r = new Network(client.getPlayerID());
+		Network r = new Network(client.getPlayerID(), DEFAULT_SYNC_RATE);
 		r.client = client;
 		r.server = null;
 		Game.net = r;
@@ -137,11 +152,7 @@ public class Network {
 		
 		for(int i = 0; i < netObjects.size(); i++) {
 			if(netObjects.get(i).isPendingDestroy()) {
-				for(int a = 0; a < server.handles.size(); a++) {
-					server.handles.get(a).removeNetObject(i);
-				}
-				netObjects.remove(i);
-				i--;
+				server.removeNetObject(netObjects.get(i));
 				continue;
 			}
 			netObjects.get(i).update(deltaTime);
@@ -161,10 +172,7 @@ public class Network {
 			return;
 		}
 		
-		for(int i = 0; i < server.handles.size(); i++) {
-			server.handles.get(i).sendNetObject(obj);
-		}
-		netObjects.add(obj);
+		server.sendNetObject(obj);
 		
 	}
 	
@@ -193,11 +201,7 @@ public class Network {
 			}
 		}
 		
-		for(int i = 0; i < server.handles.size(); i++) {
-			server.handles.get(i).sendNetObject(obj);
-		}
-		netObjects.add(obj);
-		netPlayers.add(obj);
+		server.sendNetObject(obj);
 		
 	}
 	

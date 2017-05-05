@@ -109,20 +109,26 @@ public class Physics {
 		
 		for(int a = 0; a < colliders.size(); a++) {
 			
-			if(colliders.get(a).isPendingDestroy()) {
+			Collider c = colliders.get(a);
+			if(c == null || c.isPendingDestroy()) {
 				colliders.remove(a);
 				a--;
 				continue;
 			}
 			
-			if(colliders.get(a).isStatic) continue;
-			colliders.get(a).physicsUpdate(deltaTime);
+			if(c.isStatic) continue;
+			c.physicsUpdate(deltaTime);
 			
 		}
 			
 		for(int a = 0; a < colliders.size(); a++) {
 			
 			Collider c1 = colliders.get(a);
+			if(c1 == null) {
+				colliders.remove(a);
+				a--;
+				continue;
+			}
 			
 			if(!c1.reveiveCollision
 					&& !c1.sendCollision)
@@ -131,6 +137,11 @@ public class Physics {
 			for(int b = a+1; b < colliders.size(); b++) {
 				
 				Collider c2 = colliders.get(b);
+				if(c2 == null) {
+					colliders.remove(b);
+					b--;
+					continue;
+				}
 				
 				if(c1.isStatic && c2.isStatic) continue;
 				

@@ -46,7 +46,6 @@ public class PlayerSpawn extends Collider {
 
 	@Override
 	public void update(double deltaTime) {
-		// TODO Auto-generated method stub
 		
 	}
 	

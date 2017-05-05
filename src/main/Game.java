@@ -23,10 +23,16 @@ import rendering.AnimatedTexture;
 public class Game {
 	
 	/*
-	 * TODO add option to disable vsync
+	 * TODO improve animated textures, reuseability is not good, use them like normal textures
 	 */
 	/*
-	 * TODO log files
+	 * TODO maybe component system (like in Unity)
+	 */
+	/*
+	 * TODO system for saving options
+	 */
+	/*
+	 * TODO weapon selection 
 	 */
 	/*
 	 * TODO change network input handling (client has to use server key bindings)
@@ -35,10 +41,8 @@ public class Game {
 	 * TODO add taskbar icon
 	 */
 	/*
-	 * TODO add main Menu
-	 */
-	/*
 	 * TODO add map creator level
+	 * TODO save maps and load during server creation
 	 */
 	/*
 	 * TODO server gather net object information only once and send to all clients
@@ -86,6 +90,11 @@ public class Game {
 	public static AnimatedTexture playerTex;
 	
 	/**
+	 * The animation for the grenade explosion
+	 */
+	public static AnimatedTexture explosionTex;
+	
+	/**
 	 * The currently shown level
 	 */
 	private static Level curLevel;
@@ -127,9 +136,8 @@ public class Game {
 		 * Load textures
 		 */
 		
-		if(playerTex == null) {
-			playerTex = new AnimatedTexture("textures\\player", 6);
-		}
+		playerTex = new AnimatedTexture(gamePath + "textures\\player", 6);
+		explosionTex = new AnimatedTexture(gamePath + "textures\\explosion", 20);
 		
 		TexManager.loadTex("grass", gamePath + "textures\\grass.jpg");
 		TexManager.loadTex("wall", gamePath + "textures\\wall.png");
@@ -139,6 +147,7 @@ public class Game {
 		TexManager.loadTex("ascii", gamePath + "textures\\ascii.png");
 		TexManager.loadTex("playerSpawn", gamePath + "textures\\playerSpawn.png");
 		TexManager.loadTex("grenade", gamePath + "textures\\grenade.png");
+		TexManager.loadTex("crater", gamePath + "textures\\crater.png");
 		
 		curLevel = new MainMenu();
 		

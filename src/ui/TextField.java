@@ -20,7 +20,7 @@ import rendering.StringDrawer;
 public abstract class TextField extends UiObject {
 
 	/*
-	 * TODO add ability to move cursor
+	 * TODO add ability to move cursor with mouse
 	 */
 	
 	/**
@@ -37,6 +37,10 @@ public abstract class TextField extends UiObject {
 	 * (for the blinking cursor)
 	 */
 	private double selectedTime = 0d;
+	/**
+	 * The position of the cursor
+	 */
+	private int cursorPos = 0;
 	
 	/**
 	 * Listener for keyboard
@@ -75,7 +79,8 @@ public abstract class TextField extends UiObject {
 			@Override
 			public void onChar(char input) {
 				if(selected && checkChar(input)) {
-					text.append(input);
+					text.insert(cursorPos, input);
+					cursorPos++;
 				}
 			}
 		}, Keyboard.LOCAL);
@@ -88,14 +93,28 @@ public abstract class TextField extends UiObject {
 			@Override
 			public void onKeyRepeat(int keycode, int modifiers) {
 				if(selected && keycode == GLFW.GLFW_KEY_BACKSPACE && text.length()>0) {
-					text.deleteCharAt(text.length()-1);
+					text.deleteCharAt(cursorPos-1);
+					cursorPos--;
+				} else if(selected && keycode == GLFW.GLFW_KEY_LEFT) {
+					cursorPos--;
+					cursorPos = Math.max(cursorPos, 0);
+				} else if(selected && keycode == GLFW.GLFW_KEY_RIGHT) {
+					cursorPos++;
+					cursorPos = Math.min(cursorPos, text.length());
 				}
 			}
 			
 			@Override
 			public void onKeyDown(int keycode, int modifiers) {
-				if(selected && keycode == GLFW.GLFW_KEY_BACKSPACE && text.length()>0) {
-					text.deleteCharAt(text.length()-1);
+				if(selected && keycode == GLFW.GLFW_KEY_BACKSPACE && cursorPos>0) {
+					text.deleteCharAt(cursorPos-1);
+					cursorPos--;
+				} else if(selected && keycode == GLFW.GLFW_KEY_LEFT) {
+					cursorPos--;
+					cursorPos = Math.max(cursorPos, 0);
+				} else if(selected && keycode == GLFW.GLFW_KEY_RIGHT) {
+					cursorPos++;
+					cursorPos = Math.min(cursorPos, text.length());
 				}
 			}
 		}, Keyboard.LOCAL);
@@ -123,13 +142,17 @@ public abstract class TextField extends UiObject {
 	@Override
 	protected void render() {
 		
+		/*
+		 * TODO remove this if checkChar is working with cursor (send new text with method call
+		 */
+		cursorPos = text.length();
+		
 		glColor4d(1, 1, 1, 1);
 		
 		if(selected && (selectedTime-(int)selectedTime)<0.5d) {
-			StringDrawer.drawString(text.toString() + "_", (float)pos.x + 10, (float)(pos.y + size.y/2 - StringDrawer.letterHeight/2d));
-		} else {
-			StringDrawer.drawString(text.toString(), (float)pos.x + 10, (float)(pos.y + size.y/2 - StringDrawer.letterHeight/2d));
+			StringDrawer.drawString("_", cursorPos*StringDrawer.letterWidth + pos.x + 10, pos.y + size.y/2 - StringDrawer.letterHeight/2d);
 		}
+		StringDrawer.drawString(text.toString(), pos.x + 10, pos.y + size.y/2 - StringDrawer.letterHeight/2d);
 		glDisable(GL_TEXTURE_2D);
 		
 		glBegin(GL_QUADS);

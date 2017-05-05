@@ -23,6 +23,10 @@ import ui.Ui;
 public class CreateServer extends Level {
 
 	/**
+	 * TODO set syncRate in here with NumberPicker
+	 */
+	
+	/**
 	 * The ui
 	 */
 	private Ui ui;

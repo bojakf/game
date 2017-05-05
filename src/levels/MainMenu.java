@@ -6,7 +6,6 @@ import main.Game;
 import main.Main;
 import physics.Vector;
 import ui.Button;
-import ui.TextField;
 import ui.Ui;
 
 /**
@@ -41,7 +40,7 @@ public class MainMenu extends Level {
 				}
 			}
 		});
-		bCreateServer.pos = new Vector(Main.windowWidth/2-200, Main.windowHeight-200);
+		bCreateServer.pos = new Vector(Main.windowWidth/2-200, Main.windowHeight-100);
 		bCreateServer.size = new  Vector(400, 40);
 		bCreateServer.text = "Create Server";
 		
@@ -52,9 +51,20 @@ public class MainMenu extends Level {
 				Game.changeLevel(new JoinServer());
 			}
 		});
-		bJoinServer.pos = new Vector(Main.windowWidth/2-200, Main.windowHeight-100);
+		bJoinServer.pos = new Vector(Main.windowWidth/2-200, Main.windowHeight-160);
 		bJoinServer.size = new  Vector(400, 40);
-		bJoinServer.text = "Join Server";		
+		bJoinServer.text = "Join Server";	
+		
+		Button bSettings = new Button(ui, new Button.ClickListener() {
+			
+			@Override
+			public void onClick() {
+				Game.changeLevel(new Settings());
+			}
+		});
+		bSettings.pos = new Vector(Main.windowWidth/2-200, Main.windowHeight-220);
+		bSettings.size = new Vector(400, 40);
+		bSettings.text = "Settings";
 		
 	}
 	

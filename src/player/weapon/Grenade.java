@@ -12,7 +12,10 @@ import physics.Collider;
 import physics.Damagable;
 import physics.Physics;
 import physics.Vector;
+import player.Player;
 import player.Weapon;
+import rendering.effects.AnimatedEffect;
+import rendering.effects.TextureEffect;
 
 public class Grenade extends Collider implements Weapon {
 
@@ -24,23 +27,23 @@ public class Grenade extends Collider implements Weapon {
 	/**
 	 * The size of the grenade
 	 */
-	public static final Vector DEFAULT_SIZE = new Vector(0.5d, 0.5d);
+	public static final Vector SIZE = new Vector(0.5d, 0.5d);
 	/**
 	 * The speed of the grenade
 	 */
-	private static final double DEFAULT_SPEED = 10;
+	private static final double SPEED = 10;
 	/**
 	 * The start time until the grenade explodes
 	 */
-	private static final double DEFAULT_TIME_LEFT = 3;
+	private static final double TIME_LEFT = 3;
 	/**
 	 * The size of the explosion
 	 */
-	private static final double DEFAULT_EXPLOSION_RADIUS = 2;
+	private static final double EXPLOSION_RADIUS = 2;
 	/**
 	 * The damage of the explosion
 	 */
-	private static final double DEFAULT_EXPLOSION_DAMAGE = 50;
+	private static final double EXPLOSION_DAMAGE = 50;
 	
 	/**
 	 * The position the grenade should hit
@@ -54,16 +57,16 @@ public class Grenade extends Collider implements Weapon {
 	/**
 	 * Time until the grenade explodes.
 	 */
-	private double timeLeft = DEFAULT_TIME_LEFT;
+	private double timeLeft = TIME_LEFT;
 
 	/**
 	 * Create a new grenade
 	 */
 	public Grenade(Vector pos, Vector destination) {
 		
-		super(pos, DEFAULT_SIZE, Vector.substract(destination, pos), Physics.LAYER_ENEMY);
+		super(pos, SIZE, Vector.substract(destination, pos), Physics.LAYER_ENEMY);
 		velocity.normalize();
-		velocity.scale(DEFAULT_SPEED);
+		velocity.scale(SPEED);
 		isBlocking = false;
 		isStatic = false;
 		
@@ -84,6 +87,7 @@ public class Grenade extends Collider implements Weapon {
 		if(dist > lastDist) {
 			velocity.x = 0;
 			velocity.y = 0;
+			pos = destination;
 		}
 		lastDist = dist;
 		
@@ -92,12 +96,20 @@ public class Grenade extends Collider implements Weapon {
 		 */
 		timeLeft -= deltaTime;
 		if(timeLeft <= 0) {
-			ArrayList<Collider> hit = Physics.checkCircle(pos, DEFAULT_EXPLOSION_RADIUS);
+			ArrayList<Collider> hit = Physics.checkCircle(pos, EXPLOSION_RADIUS);
 			for(int i = 0; i < hit.size(); i++) {
 				if(hit.get(i) instanceof Damagable) {
-					((Damagable)hit.get(i)).damage(DEFAULT_EXPLOSION_DAMAGE);
+					((Damagable)hit.get(i)).damage(EXPLOSION_DAMAGE);
 				}
 			}
+			new AnimatedEffect(Game.explosionTex, 
+					new Vector(pos.x-EXPLOSION_RADIUS+SIZE.x/2, pos.y-EXPLOSION_RADIUS+SIZE.y/2), 
+					new Vector(EXPLOSION_RADIUS*2, EXPLOSION_RADIUS*2), 
+					Game.explosionTex.getDuration());
+			new TextureEffect("crater", 
+					new Vector(pos.x-EXPLOSION_RADIUS+SIZE.x/2, pos.y-EXPLOSION_RADIUS+SIZE.y/2), 
+					new Vector(EXPLOSION_RADIUS*2, EXPLOSION_RADIUS*2), 
+					20);
 			destroy();
 		}
 		
@@ -107,6 +119,7 @@ public class Grenade extends Collider implements Weapon {
 	public void render() {
 		
 		glTranslated(pos.x * Game.QUAD_SIZE, pos.y * Game.QUAD_SIZE, -0.6d);
+		glColor3d(1, 1, 1);
 		
 		TexManager.bindTex("grenade");
 		
@@ -142,8 +155,10 @@ public class Grenade extends Collider implements Weapon {
 
 	@Override
 	public void onCollision(Collider hit) {
-		velocity.x = 0;
-		velocity.y = 0;
+		if(hit.isBlocking && !(hit instanceof Player)) {
+			velocity.x = 0;
+			velocity.y = 0;
+		}
 	}
 
 	@Override

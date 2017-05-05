@@ -8,8 +8,6 @@ import loading.TexManager;
  * 
  * Used to render text
  * 
- * TODO use double
- * 
  * @author jafi2
  *
  */
@@ -18,15 +16,15 @@ public class StringDrawer {
 	/**
 	 * The width of a letter. May be modified
 	 */
-	public static float letterWidth = 12;
+	public static double letterWidth = 12;
 	/**
 	 * The height of a letter. May be modified
 	 */
-	public static float letterHeight = 12;
+	public static double letterHeight = 12;
 	/**
 	 * Used for texture coordinates
 	 */
-	private static final float COORD = 1f / 16f;
+	private static final double COORD = 1d / 16d;
 	
 	/**
 	 * This class contains only static methods
@@ -38,7 +36,7 @@ public class StringDrawer {
 	 * @param text the text
 	 * @return the expected with
 	 */
-	public static float getWidth(String text) {
+	public static double getWidth(String text) {
 		return letterWidth * text.length();
 	}
 	
@@ -48,10 +46,10 @@ public class StringDrawer {
 	 * @param x the x position of the start of the string
 	 * @param y the y position of the string
 	 */
-	public static void drawString(String text, float x, float y) {
+	public static void drawString(String text, double x, double y) {
 		
 		text = text.toUpperCase();
-		float xOff = x;
+		double xOff = x;
 		for(int i = 0; i < text.length(); i++) {
 			drawLetter(xOff, y, text.charAt(i));
 			xOff += letterWidth;
@@ -65,15 +63,15 @@ public class StringDrawer {
 	 * @param x the x position of the middle of the string
 	 * @param y the y position of the middle of the string
 	 */
-	public static void drawStringCentered(String text, float x, float y) {
+	public static void drawStringCentered(String text, double x, double y) {
 		drawString(text, x-getWidth(text)/2, y-letterHeight/2);
 	}
 	
-	private static void drawLetter(float x, float y, char letter) {
+	private static void drawLetter(double x, double y, char letter) {
 		
 		TexManager.bindTex("ascii");
 		
-		float s = 0, t = 0;
+		double s = 0, t = 0;
 		
 		switch (letter) {
 		case ' ':
@@ -266,14 +264,14 @@ public class StringDrawer {
 		
 		glBegin(GL_QUADS);
 		
-		glTexCoord2f(s * COORD, t * COORD);
-		glVertex3f(x, y + letterHeight, 0);
-		glTexCoord2f((s + 1) * COORD, t * COORD);
-		glVertex3f(x + letterWidth, y + letterHeight, 0);
-		glTexCoord2f((s + 1) * COORD, (t + 1) * COORD);
-		glVertex3f(x + letterWidth, y, 0);
-		glTexCoord2f(s * COORD, (t + 1) * COORD);
-		glVertex3f(x, y, 0);
+		glTexCoord2d(s * COORD, t * COORD);
+		glVertex3d(x, y + letterHeight, 0);
+		glTexCoord2d((s + 1) * COORD, t * COORD);
+		glVertex3d(x + letterWidth, y + letterHeight, 0);
+		glTexCoord2d((s + 1) * COORD, (t + 1) * COORD);
+		glVertex3d(x + letterWidth, y, 0);
+		glTexCoord2d(s * COORD, (t + 1) * COORD);
+		glVertex3d(x, y, 0);
 		
 		glEnd();
 		

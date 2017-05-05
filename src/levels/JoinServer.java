@@ -57,6 +57,8 @@ public class JoinServer extends Level {
 		};
 		tfServerIp.pos = new Vector(Main.windowWidth/2-200, Main.windowHeight-100);
 		tfServerIp.size = new Vector(400, 40);
+		//TODO change this
+		tfServerIp.text = new StringBuilder("localhost");
 		
 		Text tServerIP = new Text(ui);
 		tServerIP.text = "Server IP:";

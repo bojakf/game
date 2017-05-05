@@ -27,7 +27,7 @@ public class GrenadeLauncher implements Weapon {
 	/**
 	 * The time required to reload
 	 */
-	private static final double RELOAD_TIME = 1;
+	private static final double RELOAD_TIME = 0.00001;
 	
 	/**
 	 * The player this weapon belongs to
@@ -56,8 +56,8 @@ public class GrenadeLauncher implements Weapon {
 			Vector m = Mouse.xy(player.getPlayerID());
 			m.x /= Game.QUAD_SIZE;
 			m.y /= Game.QUAD_SIZE;
-			m.x -= Grenade.DEFAULT_SIZE.x/2;
-			m.y -= Grenade.DEFAULT_SIZE.y/2;
+			m.x -= Grenade.SIZE.x/2;
+			m.y -= Grenade.SIZE.y/2;
 			new Grenade(Vector.add(player.getPosition(), new Vector(player.getSize().x/2, player.getSize().y/2)), m);
 		}
 		

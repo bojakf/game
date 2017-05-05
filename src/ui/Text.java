@@ -39,7 +39,7 @@ public class Text extends UiObject {
 	@Override
 	protected void render() {
 		GL11.glColor4d(1, 1, 1, 1);
-		StringDrawer.drawString(text, (float)pos.x, (float)pos.y);
+		StringDrawer.drawString(text, pos.x, pos.y);
 	}
 	
 	@Override

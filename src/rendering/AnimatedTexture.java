@@ -50,7 +50,7 @@ public class AnimatedTexture implements Cloneable, Serializable {
 	public AnimatedTexture(String location, int fps) {
 		
 		frameTime = 1d/fps;
-		File folder = new File(Game.gamePath + location);
+		File folder = new File(location);
 		if(!folder.exists()) throw new RuntimeException("Animation does not exist: " + location);
 		if(!folder.isDirectory()) throw new RuntimeException("The animation location must be a folder: " + location);
 		
@@ -90,6 +90,13 @@ public class AnimatedTexture implements Cloneable, Serializable {
 	 */
 	public void bindCur() {
 		TexManager.bindTex(texNames[curTex]);
+	}
+	
+	/**
+	 * Get the total length of the animation
+	 */
+	public double getDuration() {
+		return frameTime * texNames.length;
 	}
 	
 	@Override
