@@ -34,6 +34,8 @@ public class OnlineGame extends Level {
 	public OnlineGame(InetAddress serverAdress, int port) {
 		
 		Game.net = Network.connectToServer(serverAdress, port);
+		Game.camController.mapSizeX = Game.QUADS_X*2;
+		Game.camController.mapSizeY = Game.QUADS_Y*2;
 		
 	}
 	

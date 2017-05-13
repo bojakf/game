@@ -4,12 +4,15 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import org.lwjgl.opengl.GL11;
+
 import debug.Debug;
 import gameobject.Component;
 import gameobject.Gameobject;
 import levels.Level;
 import levels.MainMenu;
 import loading.TexManager;
+import map.CameraController;
 import network.Network;
 import physics.Physics;
 
@@ -68,6 +71,14 @@ public class Game {
 	 * Number of quads fitting in x-Direction on screen
 	 */
 	public static final double QUADS_X = Main.windowWidth/QUAD_SIZE;
+	/**
+	 * the default world offset in the x-direction in quads
+	 */
+	public static final double WORLD_OFFSET_X = 0.5;
+	/**
+	 * the default world offset in the y-direction in quads
+	 */
+	public static final double WORLD_OFFSET_Y = 0.5;
 	
 	/**
 	 * the current Network Object
@@ -84,6 +95,15 @@ public class Game {
 	 * The currently shown level
 	 */
 	private static Level curLevel;
+	
+	/**
+	 * The x-position of the camera
+	 */
+	public static double camX = 0;
+	/**
+	 * The y-position of the camera
+	 */
+	public static double camY = 0;
 	
 	/**
 	 * Number of rendering/update layers
@@ -129,6 +149,10 @@ public class Game {
 	 * All active gameobjects. Will be cleared when level changes
 	 */
 	private static ArrayList<ArrayList<Gameobject>> gameobjects;
+	/**
+	 * Class for controlling the camera
+	 */
+	public static CameraController camController;
 	
 	/**
 	 * Create the game
@@ -186,6 +210,7 @@ public class Game {
 		}
 		
 		curLevel = new MainMenu();
+		camController = new CameraController();
 		
 	}
 	
@@ -196,7 +221,6 @@ public class Game {
 	public static void changeLevel(Level lvl) {		
 		curLevel.onClose();
 		curLevel = lvl;
-		
 	}
 	
 	/**
@@ -264,6 +288,8 @@ public class Game {
 			}
 		}
 		
+		camController.update(deltaTime);
+		
 		if(Game.net != null && Game.net.isServer()) {
 			Game.net.updateNet(deltaTime);
 		}
@@ -277,17 +303,18 @@ public class Game {
 	 */
 	protected void render() {
 		
+		GL11.glTranslated(-camX*QUAD_SIZE+WORLD_OFFSET_X*QUAD_SIZE, -camY*QUAD_SIZE+WORLD_OFFSET_X*QUAD_SIZE, 0);
 		for(int a = 9; a >= 0; a--) {
 			ArrayList<Gameobject> g = gameobjects.get(a);
 			for(int i = 0; i < g.size(); i++) {
 				g.get(i).render();
 			}
 		}
-		
-		curLevel.render();
-		
 		Physics.drawColliders();
 		Debug.renderDebug();
+		GL11.glTranslated(camX*QUAD_SIZE-WORLD_OFFSET_X*QUAD_SIZE, camY*QUAD_SIZE-WORLD_OFFSET_X*QUAD_SIZE, 0);
+		
+		curLevel.render();
 		
 	}
 	

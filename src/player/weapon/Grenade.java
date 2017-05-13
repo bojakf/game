@@ -10,7 +10,6 @@ import main.Primitives;
 import physics.Collider;
 import physics.Physics;
 import physics.Vector;
-import player.Weapon;
 
 
 /**
@@ -20,7 +19,7 @@ import player.Weapon;
  * @author jafi2
  *
  */
-public class Grenade extends Component implements Weapon {
+public class Grenade extends Component {
 	
 	/**
 	 * 

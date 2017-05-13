@@ -237,12 +237,13 @@ public class NetServer {
 					 * remove objects from client and server
 					 */
 					while(removeQueue.size() > 0) {
-						out.writeByte(NetCommands.REMOVE_OBJECT);
 						NetComponent remove = removeQueue.remove(0);
-						out.writeInt(Game.net.netObjects.indexOf(remove));
+						int id = Game.net.netObjects.indexOf(remove);
+						if(id == -1) continue;
+						out.writeByte(NetCommands.REMOVE_OBJECT);
+						out.writeInt(id);
 						out.flush();
 						Game.net.netObjects.remove(remove);
-						
 					}
 					
 					/*

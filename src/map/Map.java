@@ -1,7 +1,5 @@
 package map;
 
-import java.io.Serializable;
-
 import components.Spawn;
 import gameobject.Gameobject;
 import main.Game;
@@ -15,31 +13,29 @@ import physics.Vector;
  * @author jafi2
  *
  */
-public class Map implements Serializable {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3678985439336866532L;
+public class Map {
 	
 	/**
 	 * Create the map
 	 */
 	public Map() {
 		
-		for(int x = 0; x < Game.QUADS_X-1; x++) {
-			for(int y = 0; y < Game.QUADS_Y; y++) {
+		for(int x = 0; x < Game.QUADS_X*2-1; x++) {
+			for(int y = 0; y < Game.QUADS_Y*2; y++) {
 				Primitives.mapFloor.create(new Vector(x, y)).init();
 			}
 		}
 		
-		for(int x = 0; x < Game.QUADS_X; x++) {
-			for(int y = 0; y < Game.QUADS_Y; y++) {
-				if(x == 0 || x == Math.floor(Game.QUADS_X) || y == 0 || y == Game.QUADS_Y-1) {
+		for(int x = 0; x < Game.QUADS_X*2; x++) {
+			for(int y = 0; y < Game.QUADS_Y*2; y++) {
+				if(x == 0 || x == Math.floor(Game.QUADS_X*2) || y == 0 || y == Game.QUADS_Y*2-1) {
 					Primitives.mapWall.create(new Vector(x, y)).init();
 				}
 			}
 		}
+		
+		CameraController.mapSizeX = Game.QUADS_X * 2;
+		CameraController.mapSizeY = Game.QUADS_Y * 2;
 		
 		Gameobject s = Primitives.spawn.create(new Vector(2, 2));
 		((Spawn)s.getComponent(Spawn.class)).playerID = 0;

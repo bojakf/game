@@ -10,6 +10,7 @@ import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glVertex2d;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.lwjgl.glfw.GLFW;
@@ -46,7 +47,7 @@ public class Player extends Damagable {
 	/**
 	 * The maximum speed of the player
 	 */
-	private static final double PLAYER_SPEED = 3;
+	private static final double PLAYER_SPEED = 5;
 	
 	/**
 	 * The lives the player has after joining the game
@@ -69,6 +70,8 @@ public class Player extends Damagable {
 	
 	@Override
 	public void start() {
+		
+		super.start();
 		
 		hp = INITIAL_HEALTH;
 		
@@ -131,7 +134,9 @@ public class Player extends Damagable {
 	@Override
 	public void render() {
 		
-		glTranslated((parent.pos.x-parent.size.x*0.5) * Game.QUAD_SIZE, parent.pos.y * Game.QUAD_SIZE + parent.size.y*0.5*Game.QUAD_SIZE, -10);
+		curWeapon.render();
+		
+		glTranslated((parent.pos.x-parent.size.x*0.5) * Game.QUAD_SIZE, parent.pos.y * Game.QUAD_SIZE + parent.size.y*0.5*Game.QUAD_SIZE, 0);
 		
 		if(playerID == 0) {
 			glColor3d(1, 0, 0);
@@ -158,7 +163,7 @@ public class Player extends Damagable {
 		StringDrawer.drawStringCentered("" + lives, -12, 7.5f);
 		StringDrawer.resetFontSize();
 		
-		glTranslated(-(parent.pos.x-parent.size.x*0.5) * Game.QUAD_SIZE, -parent.pos.y * Game.QUAD_SIZE - parent.size.y*0.5*Game.QUAD_SIZE, 10);
+		glTranslated(-(parent.pos.x-parent.size.x*0.5) * Game.QUAD_SIZE, -parent.pos.y * Game.QUAD_SIZE - parent.size.y*0.5*Game.QUAD_SIZE, 0);
 		
 	}
 
@@ -212,6 +217,18 @@ public class Player extends Damagable {
 	 */
 	public Vector getSize() {
 		return parent.size;
+	}
+
+	@Override
+	public void sendNetUpdate(ArrayList<Serializable> data) {
+		super.sendNetUpdate(data);
+		curWeapon.sendNetUpdate(data);
+	}
+
+	@Override
+	public void receiveNetUpdate(ArrayList<Serializable> data) {
+		super.receiveNetUpdate(data);
+		curWeapon.receiveNetUpdate(data);
 	}
 
 }

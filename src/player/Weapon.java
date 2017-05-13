@@ -1,6 +1,7 @@
 package player;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * 
@@ -24,5 +25,8 @@ public interface Weapon extends Serializable {
 	 * Render the weapon
 	 */
 	public void render();
+	
+	public void sendNetUpdate(ArrayList<Serializable> data);
+	public void receiveNetUpdate(ArrayList<Serializable> data);
 	
 }

@@ -2,12 +2,14 @@ package player.weapon;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import components.Damagable;
 import input.Mouse;
 import input.Mouse.MouseListener;
 import main.Game;
+import map.CameraController;
 import physics.Collider;
 import physics.Physics;
 import physics.Ray;
@@ -101,12 +103,17 @@ public class Laser implements Weapon {
 			Vector dir = new Vector();
 			Vector origin = new Vector();
 			Vector mp = Mouse.xy(player.getPlayerID());
+			mp.x /= Game.QUAD_SIZE;
+			mp.y /= Game.QUAD_SIZE;
+			Vector cam = CameraController.calcCamPos(player);
+			mp.x += cam.x-Game.WORLD_OFFSET_X;
+			mp.y += cam.y-Game.WORLD_OFFSET_Y;
 			
-			origin.x = player.getPosition().x + player.getSize().x/2;
-			origin.y = player.getPosition().y + player.getSize().y/2;
+			origin.x = player.getPosition().x;
+			origin.y = player.getPosition().y;
 			
-			dir.x = -(mp.x / Game.QUAD_SIZE - origin.x);
-			dir.y = -(mp.y / Game.QUAD_SIZE - origin.y);
+			dir.x = -(mp.x - origin.x);
+			dir.y = -(mp.y - origin.y);
 			dir.normalize();
 			
 			ArrayList<Collider> ignore = new ArrayList<>();
@@ -153,6 +160,20 @@ public class Laser implements Weapon {
 			
 		}
 		
+	}
+	
+	@Override
+	public void sendNetUpdate(ArrayList<Serializable> data) {
+		data.add((Boolean)laserOn);
+		data.add(laserStart);
+		data.add(laserEnd);
+	}
+	
+	@Override
+	public void receiveNetUpdate(ArrayList<Serializable> data) {
+		laserOn = (boolean)data.remove(0);
+		laserStart = (Vector)data.remove(0);
+		laserEnd = (Vector)data.remove(0);
 	}
 
 }

@@ -1,8 +1,8 @@
 package components;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-import gameobject.Component;
 import gameobject.Gameobject;
 import main.Game;
 
@@ -13,7 +13,7 @@ import main.Game;
  * @author jafi2
  *
  */
-public class Damagable extends Component {
+public abstract class Damagable extends NetComponent {
 
 	/**
 	 * 
@@ -27,7 +27,7 @@ public class Damagable extends Component {
 	
 	@Override
 	public void start() {
-		
+		super.start();
 	}
 
 
@@ -39,6 +39,9 @@ public class Damagable extends Component {
 	@Override
 	public void render() {
 		
+		/*
+		 * TODO implement hp bar
+		 */
 		throw new RuntimeException("No live drawing for non players");
 		
 	}
@@ -85,5 +88,14 @@ public class Damagable extends Component {
 		return false;
 	}
 	
+	@Override
+	public void sendNetUpdate(ArrayList<Serializable> data) {
+		data.add((Double)hp);
+	}
+	
+	@Override
+	public void receiveNetUpdate(ArrayList<Serializable> data) {
+		hp = (double)data.remove(0);
+	}
 	
 }

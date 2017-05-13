@@ -3,7 +3,12 @@ package player.weapon;
 import input.Mouse;
 import main.Game;
 import main.Primitives;
+import map.CameraController;
 import physics.Vector;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import components.Player;
 import gameobject.Gameobject;
 import player.Weapon;
@@ -56,6 +61,10 @@ public class GrenadeLauncher implements Weapon {
 			m.x /= Game.QUAD_SIZE;
 			m.y /= Game.QUAD_SIZE;
 			
+			Vector cam = CameraController.calcCamPos(player);
+			m.x += cam.x-Game.WORLD_OFFSET_Y;
+			m.y += cam.y-Game.WORLD_OFFSET_Y;
+			
 			Gameobject grenade = Primitives.grenade.create(player.getParent().pos, Grenade.SIZE);
 			((Grenade)grenade.getComponent(Grenade.class)).setDestination(m);
 			grenade.init();
@@ -66,6 +75,16 @@ public class GrenadeLauncher implements Weapon {
 
 	@Override
 	public void render() {
+		
+	}
+
+	@Override
+	public void sendNetUpdate(ArrayList<Serializable> data) {
+		
+	}
+
+	@Override
+	public void receiveNetUpdate(ArrayList<Serializable> data) {
 		
 	}	
 	
