@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+import components.FinalNetComponent;
 import components.NetComponent;
 import loading.MultiOutStream;
 import main.Game;
@@ -67,9 +68,17 @@ public class NetServer {
 	 */
 	private ArrayList<NetComponent> sendQueue = new ArrayList<>();
 	/**
+	 * Contains the finalNetComponents queued for sending to the client
+	 */
+	private ArrayList<FinalNetComponent> finalSendQueue = new ArrayList<>();
+	/**
 	 * Contains all objects queued for removal
 	 */
 	private ArrayList<NetComponent> removeQueue = new ArrayList<>();
+	/**
+	 * Contains all finalNetComponents queued for removal
+	 */
+	private ArrayList<FinalNetComponent> finalRemoveQueue = new ArrayList<>();
 	
 	/**
 	 * Create the server
@@ -121,15 +130,26 @@ public class NetServer {
 	}
 	
 	/**
-	 * Sends a new object to the client
-	 * @param obj the object
+	 * Sends a new netComponent to the client
+	 * @param obj the netComponent
 	 */
-	protected void sendNetObject(NetComponent obj) {
+	protected void sendNetComponent(NetComponent obj) {
 		if(handles.size() == 0)
-			Game.net.netObjects.add(obj);
+			Game.net.netComponents.add(obj);
 		else {
-			
 			sendQueue.add(obj);
+		}
+	}
+	
+	/**
+	 * Sends a new FinalNetComponent to the client
+	 * @param obj the finalNetComponent
+	 */
+	protected void sendFinalNetComponent(FinalNetComponent obj) {
+		if(handles.size() == 0)
+			Game.net.finalNetComponents.add(obj);
+		else {
+			finalSendQueue.add(obj);
 		}
 	}
 	
@@ -138,7 +158,23 @@ public class NetServer {
 	 * @param id the net object to remove
 	 */
 	protected void removeNetObject(NetComponent id) {
-		removeQueue.add(id);
+		if(handles.size() == 0) {
+			Game.net.netComponents.remove(id);
+		} else {
+			removeQueue.add(id);
+		}
+	}
+	
+	/**
+	 * Removes a finalNetComponent from the game
+	 * @param id the net object to remove
+	 */
+	protected void removeFinalNetObject(FinalNetComponent id) {
+		if(handles.size() == 0) {
+			Game.net.finalNetComponents.remove(id);
+		} else {
+			finalRemoveQueue.add(id);
+		}
 	}
 	
 	/**
@@ -168,9 +204,14 @@ public class NetServer {
 					out.writeInt(playerID);
 					
 					
-					for(int i = 0; i < Game.net.netObjects.size(); i++) {
+					for(int i = 0; i < Game.net.netComponents.size(); i++) {
 						out.writeByte(NetCommands.ADD_OBJECT);
-						out.writeObject(Game.net.netObjects.get(i));
+						out.writeObject(Game.net.netComponents.get(i));
+					}
+					
+					for(int i = 0; i < Game.net.finalNetComponents.size(); i++) {
+						out.writeByte(NetCommands.ADD_FINAL_COMPONENT);
+						out.writeObject(Game.net.finalNetComponents.get(i));
 					}
 					
 					out.flush();
@@ -208,16 +249,16 @@ public class NetServer {
 					
 				if(1/deltaTime > Game.net.SYNC_RATE) {
 					double sleepTime = (1/Game.net.SYNC_RATE - deltaTime)*1000;
-					try {
-						Thread.sleep((long) sleepTime);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+//					try {
+//						Thread.sleep((long) sleepTime);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
 					now = System.nanoTime();
 					deltaTime = (now-last)/1000000000d;
 				}
 				last = now;
-//				System.out.println(1/deltaTime);
+				System.out.println(1/deltaTime);
 				/*
 				 * Add new clients to update multiStream
 				 */
@@ -238,12 +279,25 @@ public class NetServer {
 					 */
 					while(removeQueue.size() > 0) {
 						NetComponent remove = removeQueue.remove(0);
-						int id = Game.net.netObjects.indexOf(remove);
+						int id = Game.net.netComponents.indexOf(remove);
 						if(id == -1) continue;
 						out.writeByte(NetCommands.REMOVE_OBJECT);
 						out.writeInt(id);
 						out.flush();
-						Game.net.netObjects.remove(remove);
+						Game.net.netComponents.remove(remove);
+					}
+					
+					/*
+					 * remove finalNetComponents
+					 */
+					while(finalRemoveQueue.size() > 0) {
+						FinalNetComponent remove = finalRemoveQueue.remove(0);
+						int id = Game.net.finalNetComponents.indexOf(remove);
+						if(id == -1) continue;
+						out.writeByte(NetCommands.REMOVE_FINAL_COMPONENT);
+						out.writeInt(id);
+						out.flush();
+						Game.net.finalNetComponents.remove(id);
 					}
 					
 					/*
@@ -253,16 +307,30 @@ public class NetServer {
 						
 						NetComponent obj = sendQueue.remove(0);
 						out.writeByte(NetCommands.ADD_OBJECT);
-						Game.net.netObjects.add(obj);
+						Game.net.netComponents.add(obj);
 						out.writeObject(obj);
 						out.flush();
 						
 					}
+					
+					/*
+					 * Send new finalNetComponents
+					 */
+					while(finalSendQueue.size() > 0) {
+						
+						FinalNetComponent obj = finalSendQueue.remove(0);
+						out.writeByte(NetCommands.ADD_FINAL_COMPONENT);
+						Game.net.finalNetComponents.add(obj);
+						out.writeObject(obj);
+						out.flush();
+						
+					}
+					
 //					long c = System.nanoTime();
 					/*
 					 * update objects at client
 					 */
-					for(int i = 0; i < Game.net.netObjects.size(); i++) {
+					for(int i = 0; i < Game.net.netComponents.size(); i++) {
 						
 //						c = System.nanoTime();
 						
@@ -270,7 +338,7 @@ public class NetServer {
 						 * Update existing objects
 						 */
 						ArrayList<Serializable> data = new ArrayList<>();
-						Game.net.netObjects.get(i).sendNetUpdate(data);
+						Game.net.netComponents.get(i).sendNetUpdate(data);
 						
 						out.writeByte(NetCommands.UPDATE_OBJECT);
 						out.writeInt(i);

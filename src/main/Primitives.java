@@ -1,6 +1,8 @@
 package main;
 
 import components.Effect;
+import components.FinalNetComponent;
+import components.FinalRenderer;
 import components.Player;
 import components.Renderer;
 import components.Spawn;
@@ -56,11 +58,11 @@ public class Primitives {
 	static {
 		
 		mapWall = new Primitive(Game.L_WALL);
-		mapWall.addComponent(Renderer.class, "wall");
+		mapWall.addComponent(FinalRenderer.class, "wall");
 		mapWall.addComponent(Collider.class, Physics.LAYER_WORLD);
 		
 		mapFloor = new Primitive(Game.L_FLOOR);
-		mapFloor.addComponent(Renderer.class, "grass");
+		mapFloor.addComponent(FinalRenderer.class, "grass");
 		
 		player = new Primitive(Game.L_PLAYER);
 		player.addComponent(Renderer.class, TexManager.getAnimation("player"));

@@ -71,8 +71,6 @@ public class Player extends Damagable {
 	@Override
 	public void start() {
 		
-		super.start();
-		
 		hp = INITIAL_HEALTH;
 		
 		Color wCol = null;
@@ -103,6 +101,9 @@ public class Player extends Damagable {
 				break;
 			}
 		}
+		
+
+		super.start();
 		
 	}
 

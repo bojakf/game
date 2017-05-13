@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import components.FinalNetComponent;
 import components.NetComponent;
 import input.Keyboard;
 import input.Keyboard.CharListener;
@@ -275,7 +276,7 @@ public class NetClient {
 					} else if(command == NetCommands.ADD_OBJECT) {
 						NetComponent n =((NetComponent)in.readObject());
 						n.getParent().init();
-						Game.net.netObjects.add(n);
+						Game.net.netComponents.add(n);
 					} else if(command == NetCommands.UPDATE_OBJECT) {
 						
 						int id = in.readInt();
@@ -286,12 +287,22 @@ public class NetClient {
 							data.add((Serializable)in.readObject());
 						}
 						
-						Game.net.netObjects.get(id).receiveNetUpdate(data);
+						Game.net.netComponents.get(id).receiveNetUpdate(data);
 						
 					} else if(command == NetCommands.REMOVE_OBJECT) {
 						
 						int id = in.readInt();
-						NetComponent obj = Game.net.netObjects.remove(id);
+						NetComponent obj = Game.net.netComponents.remove(id);
+						obj.getParent().destroy();
+						
+					} else if(command == NetCommands.ADD_FINAL_COMPONENT) {
+						FinalNetComponent n =((FinalNetComponent)in.readObject());
+						n.getParent().init();
+						Game.net.finalNetComponents.add(n);
+					} else if(command == NetCommands.REMOVE_FINAL_COMPONENT) {
+						
+						int id = in.readInt();
+						FinalNetComponent obj = Game.net.finalNetComponents.remove(id);
 						obj.getParent().destroy();
 						
 					} else {

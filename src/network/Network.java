@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import components.FinalNetComponent;
 import components.NetComponent;
 import main.Game;
 import main.Primitives;
@@ -61,9 +62,13 @@ public class Network {
 	private NetClient client;
 	
 	/**
-	 * All objects updated through network, also contains netPlayers
+	 * All netComponents updated through network, also contains netPlayers
 	 */
-	protected ArrayList<NetComponent> netObjects;
+	protected ArrayList<NetComponent> netComponents;
+	/**
+	 * All finalNetComponents sent through network
+	 */
+	protected ArrayList<FinalNetComponent> finalNetComponents;
 	
 	/**
 	 * initializes Network
@@ -72,7 +77,8 @@ public class Network {
 	 */
 	private Network(int playerID, double syncRate) {
 		this.playerID = playerID;
-		netObjects = new ArrayList<>();
+		netComponents = new ArrayList<>();
+		finalNetComponents = new ArrayList<>();
 		SYNC_RATE = syncRate;
 	}
 	
@@ -128,9 +134,16 @@ public class Network {
 			return;
 		}
 		
-		for(int i = 0; i < netObjects.size(); i++) {
-			if(netObjects.get(i).isDestroyed()) {
-				server.removeNetObject(netObjects.get(i));
+		for(int i = 0; i < netComponents.size(); i++) {
+			if(netComponents.get(i).isDestroyed()) {
+				server.removeNetObject(netComponents.get(i));
+				continue;
+			}
+		}
+		
+		for(int i = 0; i < finalNetComponents.size(); i++) {
+			if(finalNetComponents.get(i).isDestroyed()) {
+				server.removeFinalNetObject(finalNetComponents.get(i));
 				continue;
 			}
 		}
@@ -138,18 +151,31 @@ public class Network {
 	}
 	
 	/**
-	 * Adds a Object to the network
-	 * @param obj the object
+	 * Adds a NetComponent to the network
+	 * @param obj the NetComponent
 	 */
 	public void add(NetComponent obj) {
 		
 		if(playerID == 0) {
-			server.sendNetObject(obj);
+			server.sendNetComponent(obj);
 		} else {
-			netObjects.add(obj);
+			netComponents.add(obj);
 			obj.getParent().init();
 		}
 		
+	}
+	
+	/**
+	 * Adds a FinalNetComponent to the network
+	 * @param obj the finalNetComponent
+	 */
+	public void add(FinalNetComponent obj) {
+		if(playerID == 0) {
+			server.sendFinalNetComponent(obj);
+		} else {
+			finalNetComponents.add(obj);
+			obj.getParent().init();
+		}
 	}
 	
 	/**

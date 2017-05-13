@@ -14,7 +14,7 @@ public class NetCommands {
 	 */
 	
 	/**
-	 * add a object to the client
+	 * add a object
 	 */
 	public static final byte ADD_OBJECT = 1;
 	/**
@@ -25,6 +25,14 @@ public class NetCommands {
 	 * remove a object
 	 */
 	public static final byte REMOVE_OBJECT = 3;
+	/**
+	 * add a finalNetComponent
+	 */
+	public static final byte ADD_FINAL_COMPONENT = 4;
+	/**
+	 * remove a finalNetComponent
+	 */
+	public static final byte REMOVE_FINAL_COMPONENT = 5;
 	/**
 	 * disconnect
 	 */
