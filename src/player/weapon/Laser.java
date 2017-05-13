@@ -2,19 +2,18 @@ package player.weapon;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
+import components.Damagable;
 import input.Mouse;
 import input.Mouse.MouseListener;
 import main.Game;
 import physics.Collider;
-import physics.Damagable;
 import physics.Physics;
 import physics.Ray;
 import physics.RaycastHit;
 import physics.Vector;
-import player.Player;
+import components.Player;
 import player.Weapon;
 import rendering.Color;
 
@@ -47,13 +46,17 @@ public class Laser implements Weapon {
 	private Player player;
 	
 	/**
-	 * Start and end of the player's laser
+	 * Start of the player's laser
 	 */
-	private Vector laserStart, laserEnd;
+	public Vector laserStart; 
+	/**
+	 * End of the player's laser
+	 */
+	public Vector laserEnd;
 	/**
 	 * Is the player's laser turned on
 	 */
-	private boolean laserOn = false;
+	public boolean laserOn = false;
 	
 	/**
 	 * mouseListener of the weapon
@@ -63,7 +66,7 @@ public class Laser implements Weapon {
 	/**
 	 * Create a new laser
 	 * @param col the color of the laser
-	 * @param playerID the player the weapon belongs to
+	 * @param player the player the weapon belongs to
 	 */
 	public Laser(Color col, Player player) {
 		
@@ -107,13 +110,13 @@ public class Laser implements Weapon {
 			dir.normalize();
 			
 			ArrayList<Collider> ignore = new ArrayList<>();
-			ignore.add(player);
+			ignore.add((Collider)player.getParent().getComponent(Collider.class));
 			RaycastHit hit = Physics.raycast(new Ray(origin, dir), Physics.LAYER_DEFAULT | Physics.RAYCAST_ALL, ignore);
 			
 			laserStart = origin;
 			if(hit != null) {
-				if(hit.hit instanceof Damagable) {
-					((Damagable)hit.hit).damage(LASER_DPS * deltaTime);
+				if(hit.hit.getParent().hasComponent(Damagable.class)) {
+					((Damagable)hit.hit.getParent().getComponent(Damagable.class)).damage(LASER_DPS * deltaTime);
 				}
 				laserEnd = hit.pos;
 			} else {
@@ -150,25 +153,6 @@ public class Laser implements Weapon {
 			
 		}
 		
-	}
-
-	@Override
-	public boolean isPendingDestroy() {
-		return false;
-	}
-	
-	@Override
-	public void sendNetUpdate(ArrayList<Serializable> data) {
-		data.add(laserStart);
-		data.add(laserEnd);
-		data.add(laserOn);
-	}
-
-	@Override
-	public void receiveNetUpdate(ArrayList<Serializable> data) {
-		laserStart = (Vector) data.remove(0);
-		laserEnd = (Vector) data.remove(0);
-		laserOn = (boolean) data.remove(0);
 	}
 
 }

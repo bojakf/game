@@ -14,13 +14,22 @@ import loading.TexManager;
 public class StringDrawer {
 	
 	/**
+	 * The standard letter width
+	 */
+	public static final double STD_LETTER_WIDTH = 12;
+	/**
+	 * The standard letter height
+	 */
+	public static final double STD_LETTER_HEIGHT = 12;
+	
+	/**
 	 * The width of a letter. May be modified
 	 */
-	public static double letterWidth = 12;
+	public static double letterWidth = STD_LETTER_WIDTH;
 	/**
 	 * The height of a letter. May be modified
 	 */
-	public static double letterHeight = 12;
+	public static double letterHeight = STD_LETTER_HEIGHT;
 	/**
 	 * Used for texture coordinates
 	 */
@@ -30,6 +39,24 @@ public class StringDrawer {
 	 * This class contains only static methods
 	 */
 	private StringDrawer() {}
+	
+	/**
+	 * Set the font size
+	 * @param width letter width
+	 * @param height letter height
+	 */
+	public static void setFontSize(double width, double height) {
+		letterWidth = width;
+		letterHeight = height;
+	}
+	
+	/**
+	 * Reset to standard font size
+	 */
+	public static void resetFontSize() {
+		letterWidth = STD_LETTER_WIDTH;
+		letterHeight = STD_LETTER_HEIGHT;
+	}
 	
 	/**
 	 * Get the width a text would have
@@ -67,6 +94,12 @@ public class StringDrawer {
 		drawString(text, x-getWidth(text)/2, y-letterHeight/2);
 	}
 	
+	/**
+	 * Draw a letter at the specified position
+	 * @param x the x-position
+	 * @param y the y-position
+	 * @param letter the letter
+	 */
 	private static void drawLetter(double x, double y, char letter) {
 		
 		TexManager.bindTex("ascii");

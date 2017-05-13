@@ -2,14 +2,16 @@ package main;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import debug.Debug;
+import gameobject.Component;
+import gameobject.Gameobject;
 import levels.Level;
 import levels.MainMenu;
 import loading.TexManager;
 import network.Network;
 import physics.Physics;
-import rendering.AnimatedTexture;
 
 /**
  * 
@@ -22,12 +24,6 @@ import rendering.AnimatedTexture;
 
 public class Game {
 	
-	/*
-	 * TODO improve animated textures, reuseability is not good, use them like normal textures
-	 */
-	/*
-	 * TODO maybe component system (like in Unity)
-	 */
 	/*
 	 * TODO system for saving options
 	 */
@@ -45,19 +41,19 @@ public class Game {
 	 * TODO save maps and load during server creation
 	 */
 	/*
-	 * TODO server gather net object information only once and send to all clients
-	 */
-	/*
 	 * TODO maybe add option to use multicast to send server updates to the clients
-	 */
-	/*
-	 * TODO use a default texture for the floor and not many objects. Set the size at which the texture should be repeated
 	 */
 	/*
 	 * TODO mipmaping
 	 */
 	/*
 	 * TODO texture packs
+	 */
+	/*
+	 * TODO replace new Exception().printStackTrace() with throw new RuntimeException();
+	 */
+	/*
+	 * TODO weapons as components?
 	 */
 	
 	/**
@@ -85,19 +81,54 @@ public class Game {
 	public static String gamePath;
 	
 	/**
-	 * The animation for the player
-	 */
-	public static AnimatedTexture playerTex;
-	
-	/**
-	 * The animation for the grenade explosion
-	 */
-	public static AnimatedTexture explosionTex;
-	
-	/**
 	 * The currently shown level
 	 */
 	private static Level curLevel;
+	
+	/**
+	 * Number of rendering/update layers
+	 */
+	public static final int LAYERS = 10;
+	/**
+	 * The highest layer (drawn above everything else)
+	 */
+	public static final int L_HIGHEST = 0;
+	/**
+	 * Layer for player
+	 */
+	public static final int L_PLAYER = 1;
+	/**
+	 * layer for weapons
+	 */
+	public static final int L_WEAPONS = 2;
+	/**
+	 * layer for walls
+	 */
+	public static final int L_WALL = 3;
+	/**
+	 * effect layer 1
+	 */
+	public static final int L_EFFECT_1 = 4;
+	/**
+	 * effect layer 2
+	 */
+	public static final int L_EFFECT_2 = 5;
+	/**
+	 * layer for decoration
+	 */
+	public static final int L_DECO = 7;
+	/**
+	 * layer for floor
+	 */
+	public static final int L_FLOOR = 8;
+	/**
+	 * lowest layer (drawn under everything else)
+	 */
+	public static final int L_LOWEST = LAYERS-1;
+	/**
+	 * All active gameobjects. Will be cleared when level changes
+	 */
+	private static ArrayList<ArrayList<Gameobject>> gameobjects;
 	
 	/**
 	 * Create the game
@@ -136,8 +167,8 @@ public class Game {
 		 * Load textures
 		 */
 		
-		playerTex = new AnimatedTexture(gamePath + "textures\\player", 6);
-		explosionTex = new AnimatedTexture(gamePath + "textures\\explosion", 20);
+		TexManager.loadAnimation("player", gamePath + "textures\\player", 6);
+		TexManager.loadAnimation("explosion", gamePath + "textures\\explosion", 20);
 		
 		TexManager.loadTex("grass", gamePath + "textures\\grass.jpg");
 		TexManager.loadTex("wall", gamePath + "textures\\wall.png");
@@ -149,6 +180,11 @@ public class Game {
 		TexManager.loadTex("grenade", gamePath + "textures\\grenade.png");
 		TexManager.loadTex("crater", gamePath + "textures\\crater.png");
 		
+		gameobjects = new ArrayList<>();
+		for(int i = 0; i < LAYERS; i++) {
+			gameobjects.add(new ArrayList<>());
+		}
+		
 		curLevel = new MainMenu();
 		
 	}
@@ -157,9 +193,56 @@ public class Game {
 	 * Changes the level. Calls onClose on the removed level
 	 * @param lvl the new level
 	 */
-	public static void changeLevel(Level lvl) {
+	public static void changeLevel(Level lvl) {		
 		curLevel.onClose();
 		curLevel = lvl;
+		
+	}
+	
+	/**
+	 * Removes all gameobjects
+	 */
+	public static void removeAllGameobjects() {
+		for(int i = 0; i < gameobjects.size(); i++) {
+			ArrayList<Gameobject> g = gameobjects.get(i);
+			while (g.size() > 0) {
+				g.remove(0).destroy();
+			}
+		}
+	}
+	
+	/**
+	 * adds a gameobject to the game
+	 * @param obj the gameobject to add
+	 * @param layer the layer to update and render the object on
+	 */
+	public static void addGameobject(Gameobject obj, int layer) {
+		gameobjects.get(layer).add(obj);
+	}
+	
+	/**
+	 * Removes a gameobject from the game
+	 * @param obj the gameobject
+	 * @return true if this list contained the specified element
+	 */
+	public static boolean removeGameobject(Gameobject obj) {
+		return gameobjects.remove(obj);
+	}
+	
+	/**
+	 * Get the gameobjects which have the specified component
+	 * @param comp the component
+	 * @return the gameobjects which have the specified component
+	 */
+	public static ArrayList<Gameobject> gameobjectsWith(Class<? extends Component> comp) {
+		ArrayList<Gameobject> g = new ArrayList<>();
+		for(int a = 0; a < gameobjects.size(); a++) {
+			ArrayList<Gameobject> c = gameobjects.get(a);
+			for(int i = 0; i < c.size(); i++) {
+				if(c.get(i).hasComponent(comp)) g.add(c.get(i));
+			}
+		}
+		return g;
 	}
 	
 	/**
@@ -169,7 +252,22 @@ public class Game {
 	 * @param deltaTime time since the last update
 	 */
 	protected void update(double deltaTime) {
+		
 		curLevel.update(deltaTime);
+		
+		if(Game.net == null || Game.net.isServer()) {
+			for(int a = 0; a < gameobjects.size(); a++) {
+				ArrayList<Gameobject> g = gameobjects.get(a);
+				for(int i = 0; i < g.size(); i++) {
+					g.get(i).update(deltaTime);
+				}
+			}
+		}
+		
+		if(Game.net != null && Game.net.isServer()) {
+			Game.net.updateNet(deltaTime);
+		}
+
 	}
 	
 	/**
@@ -178,6 +276,13 @@ public class Game {
 	 * all rendering must be done in here
 	 */
 	protected void render() {
+		
+		for(int a = 9; a >= 0; a--) {
+			ArrayList<Gameobject> g = gameobjects.get(a);
+			for(int i = 0; i < g.size(); i++) {
+				g.get(i).render();
+			}
+		}
 		
 		curLevel.render();
 		

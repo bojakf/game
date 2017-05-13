@@ -2,12 +2,15 @@ package levels;
 
 import java.net.InetAddress;
 
+import components.Player;
+import gameobject.Gameobject;
 import main.Game;
 import main.Main;
+import main.Primitives;
 import map.Map;
 import network.Network;
 import physics.Physics;
-import player.Player;
+import physics.Vector;
 
 /**
  * 
@@ -47,20 +50,20 @@ public class OnlineGame extends Level {
 		
 		new Map();
 		
-		Game.net.registerNetPlayer(new Player(0));
+		Gameobject player = Primitives.player.create(new Vector(10, 10));
+		((Player)player.getComponent(Player.class)).setPlayerID(0);
+		player.init();
 		
 	}
 	
 	@Override
 	public void update(double deltaTime) {
-		if(Game.net.isServer()) {
-			Game.net.updateNetObjects(deltaTime); 
-		}
+		
 	}
 
 	@Override
 	public void render() {
-		Game.net.renderNetObjects();
+		
 	}
 
 	@Override
@@ -74,8 +77,18 @@ public class OnlineGame extends Level {
 	 * TODO move this to physics thread
 	 */
 	private PhysicsRunnable physicsRunnable;
+	/**
+	 * 
+	 * Used to run a physics thread
+	 * 
+	 * @author jafi2
+	 *
+	 */
 	private class PhysicsRunnable implements Runnable {
 		
+		/**
+		 * Should the physics thread stop
+		 */
 		private boolean stop = false;
 		
 		@Override

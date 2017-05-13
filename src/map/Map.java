@@ -1,9 +1,11 @@
 package map;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
+import components.Spawn;
+import gameobject.Gameobject;
 import main.Game;
+import main.Primitives;
 import physics.Vector;
 
 /**
@@ -19,51 +21,38 @@ public class Map implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -3678985439336866532L;
-
-	/**
-	 * The floor
-	 */
-	private ArrayList<MapFloor> floor;
-	/**
-	 * the wals
-	 */
-	private ArrayList<MapWall> walls;
 	
 	/**
 	 * Create the map
 	 */
 	public Map() {
 		
-		floor = new ArrayList<>();
-		walls = new ArrayList<>();
-		
 		for(int x = 0; x < Game.QUADS_X-1; x++) {
 			for(int y = 0; y < Game.QUADS_Y; y++) {
-				if(x == 5 && y == 5) {
-					floor.add(new MapFloor(new Vector(x, y), new Vector(2, 2), "grass"));
-					Game.net.registerNetObject(floor.get(floor.size()-1));
-				} else if ((x == 5 || x == 6) && (y == 5 || y == 6)) {
-					
-				} else {
-					floor.add(new MapFloor(new Vector(x, y), "grass"));
-					Game.net.registerNetObject(floor.get(floor.size()-1));
-				}
+				Primitives.mapFloor.create(new Vector(x, y)).init();
 			}
 		}
 		
 		for(int x = 0; x < Game.QUADS_X; x++) {
 			for(int y = 0; y < Game.QUADS_Y; y++) {
 				if(x == 0 || x == Math.floor(Game.QUADS_X) || y == 0 || y == Game.QUADS_Y-1) {
-					walls.add(new MapWall(new Vector(x, y), "wall"));
-					Game.net.registerNetObject(walls.get(walls.size()-1));
+					Primitives.mapWall.create(new Vector(x, y)).init();
 				}
 			}
 		}
 		
-		Game.net.registerNetObject(new PlayerSpawn(new Vector(2, 2), 0));
-		Game.net.registerNetObject(new PlayerSpawn(new Vector(2, Game.QUADS_Y-3), 1));
-		Game.net.registerNetObject(new PlayerSpawn(new Vector((int)Game.QUADS_X-2, Game.QUADS_Y-3), 2));
-		Game.net.registerNetObject(new PlayerSpawn(new Vector((int)Game.QUADS_X-2, 2), 3));
+		Gameobject s = Primitives.spawn.create(new Vector(2, 2));
+		((Spawn)s.getComponent(Spawn.class)).playerID = 0;
+		s.init();
+		s = Primitives.spawn.create(new Vector(2, Game.QUADS_Y-3));
+		((Spawn)s.getComponent(Spawn.class)).playerID = 1;
+		s.init();
+		s = Primitives.spawn.create(new Vector((int)Game.QUADS_X-2, Game.QUADS_Y-3));
+		((Spawn)s.getComponent(Spawn.class)).playerID = 2;
+		s.init();
+		s = Primitives.spawn.create(new Vector((int)Game.QUADS_X-2, 2));
+		((Spawn)s.getComponent(Spawn.class)).playerID = 3;
+		s.init();
 		
 	}
 	

@@ -1,5 +1,6 @@
 package network;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -10,9 +11,9 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+import components.NetComponent;
 import loading.MultiOutStream;
 import main.Game;
-import player.Player;
 
 /**
  * 
@@ -22,6 +23,10 @@ import player.Player;
  *
  */
 public class NetServer {
+	
+	/*
+	 * FIXME improve sending (only one netComponent per gameobject)
+	 */
 	
 	/**
 	 * Thread for accepting Clients
@@ -60,11 +65,11 @@ public class NetServer {
 	/**
 	 * Contains the objects queued for sending to the client
 	 */
-	private ArrayList<NetObject> sendQueue = new ArrayList<>();
+	private ArrayList<NetComponent> sendQueue = new ArrayList<>();
 	/**
 	 * Contains all objects queued for removal
 	 */
-	private ArrayList<NetObject> removeQueue = new ArrayList<>();
+	private ArrayList<NetComponent> removeQueue = new ArrayList<>();
 	
 	/**
 	 * Create the server
@@ -119,20 +124,20 @@ public class NetServer {
 	 * Sends a new object to the client
 	 * @param obj the object
 	 */
-	protected void sendNetObject(NetObject obj) {
-		if(handles.size() == 0) {
-			if(obj instanceof Player)
-				Game.net.netPlayers.add(((NetPlayer)obj));
+	protected void sendNetObject(NetComponent obj) {
+		if(handles.size() == 0)
 			Game.net.netObjects.add(obj);
-		} else
+		else {
+			
 			sendQueue.add(obj);
+		}
 	}
 	
 	/**
 	 * Removes a net object from the game
 	 * @param id the net object to remove
 	 */
-	protected void removeNetObject(NetObject id) {
+	protected void removeNetObject(NetComponent id) {
 		removeQueue.add(id);
 	}
 	
@@ -148,32 +153,33 @@ public class NetServer {
 				
 				try {
 				
+					
 					Socket client = serverSocket.accept();
 					
-					ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
+					BufferedOutputStream o = new BufferedOutputStream(client.getOutputStream());
+					ObjectOutputStream out = new ObjectOutputStream(o);
 					ObjectInputStream in = new ObjectInputStream(client.getInputStream());
 					
 					/*
 					 * Generate player
 					 */
-					int playerID = Game.net.genPlayerID();
+					int playerID = Game.net.createPlayer();
 					
 					out.writeInt(playerID);
-					Game.net.registerNetPlayer(new Player(playerID));
 					
 					
 					for(int i = 0; i < Game.net.netObjects.size(); i++) {
-						if(Game.net.netObjects.get(i) instanceof NetPlayer) 
-							out.writeByte(NetCommands.ADD_PLAYER);
-						else
-							out.writeByte(NetCommands.ADD_OBJECT);
+						out.writeByte(NetCommands.ADD_OBJECT);
 						out.writeObject(Game.net.netObjects.get(i));
 					}
+					
+					out.flush();
+					out.reset();
 					
 					NetHandle handle = new NetHandle(client, out, in);
 					handle.playerID = playerID;
 					handles.add(handle);
-					outAddQueue.add(handle.out);
+					outAddQueue.add(o);
 					
 				
 				} catch (IOException e) {
@@ -211,7 +217,7 @@ public class NetServer {
 					deltaTime = (now-last)/1000000000d;
 				}
 				last = now;
-				
+//				System.out.println(1/deltaTime);
 				/*
 				 * Add new clients to update multiStream
 				 */
@@ -222,20 +228,20 @@ public class NetServer {
 				/*
 				 * FIXME exception aborts update for all clients @see MultiOutStream
 				 */
+				/*
+				 * TODO improve performance of this block
+				 */
 				try {
 					
 					/*
 					 * remove objects from client and server
 					 */
 					while(removeQueue.size() > 0) {
-						
 						out.writeByte(NetCommands.REMOVE_OBJECT);
-						NetObject remove = removeQueue.remove(0);
+						NetComponent remove = removeQueue.remove(0);
 						out.writeInt(Game.net.netObjects.indexOf(remove));
+						out.flush();
 						Game.net.netObjects.remove(remove);
-						if(remove instanceof NetPlayer) {
-							Game.net.netPlayers.remove(remove);
-						}
 						
 					}
 					
@@ -244,21 +250,20 @@ public class NetServer {
 					 */
 					while(sendQueue.size() > 0) {
 						
-						NetObject obj = sendQueue.remove(0);
-						if(obj instanceof NetPlayer) {
-							out.writeByte(NetCommands.ADD_PLAYER);
-							Game.net.netPlayers.add((NetPlayer)obj);
-						} else
-							out.writeByte(NetCommands.ADD_OBJECT);
+						NetComponent obj = sendQueue.remove(0);
+						out.writeByte(NetCommands.ADD_OBJECT);
 						Game.net.netObjects.add(obj);
 						out.writeObject(obj);
+						out.flush();
 						
 					}
-					
+//					long c = System.nanoTime();
 					/*
 					 * update objects at client
 					 */
 					for(int i = 0; i < Game.net.netObjects.size(); i++) {
+						
+//						c = System.nanoTime();
 						
 						/*
 						 * Update existing objects
@@ -270,9 +275,17 @@ public class NetServer {
 						out.writeInt(i);
 						out.writeInt(data.size());
 						
+//						System.out.println("init      " + (System.nanoTime()-c)+"ns");
+						
+						
 						for(int a = 0; a < data.size(); a++) {
+//							c = System.nanoTime();
 							out.writeObject(data.get(a));
+//							System.out.println("write     " + (System.nanoTime()-c)+"ns");
 						}
+//						c = System.nanoTime();
+						out.flush();
+//						System.out.println("flush     " + (System.nanoTime()-c)+"ns");
 						
 					}
 					
@@ -280,8 +293,13 @@ public class NetServer {
 					 * Reset output stream in order to prevent
 					 * referencing already sent objects
 					 */
+					
+//					c = System.nanoTime();
+					
 					out.flush();
 					out.reset();
+					
+//					System.out.println("final     " + (System.nanoTime()-c)+"ns");
 					
 				} catch (IOException e) {
 					e.printStackTrace();

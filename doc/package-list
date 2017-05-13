@@ -1,4 +1,6 @@
+components
 debug
+gameobject
 input
 levels
 loading
@@ -6,6 +8,8 @@ main
 map
 network
 physics
+player
+player.weapon
 rendering
 ui
 utility

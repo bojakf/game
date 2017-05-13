@@ -1,19 +1,23 @@
 package physics;
 
 import static org.lwjgl.opengl.GL11.*;
+import java.util.ArrayList;
 
-import java.io.Serializable;
-
+import gameobject.Component;
 import main.Game;
-import network.NetObject;
 
-public abstract class Collider implements Serializable, NetObject {
+/**
+ * 
+ * Collider component for physical calculation
+ * 
+ * @author jafi2
+ *
+ */
+public class Collider extends Component {
 
-	/**
-	 * 
+	/*
+	 * TODO move this to components package
 	 */
-	private static final long serialVersionUID = -677833801751417709L;
-
 	/*
 	 * TODO final colliders
 	 */
@@ -22,23 +26,38 @@ public abstract class Collider implements Serializable, NetObject {
 	 */
 	
 	/**
-	 * Did the physics thread remove the collider
+	 * 
 	 */
-	protected boolean pendingDestroy = false;
+	private static final long serialVersionUID = -3988997315667362511L;
 	
 	/**
-	 * position of the collider
+	 * position of the collider(middle)
+	 * TODO make this final
 	 */
 	protected Vector pos;
 	/**
 	 * size of the collider
+	 * TODO make this final
 	 */
 	protected Vector size;
+	/**
+	 * The velocity of the collider
+	 * TODO make this final
+	 */
 	protected Vector velocity;
-	protected int layer;
+	/**
+	 * The physical layer of the collider
+	 */
+	protected int layer = Physics.LAYER_DEFAULT;
 	
+	/**
+	 * Can the collider cause collision events
+	 */
 	public boolean sendCollision = true;
-	public boolean reveiveCollision = true;
+	/**
+	 * Can the collider receive collision events
+	 */
+	public boolean receiveCollision = true;
 	/**
 	 * Can other objects pass through the collider<br>
 	 * if on one of the colliders has isBlocking == false the colliders can pass through each other.<br>
@@ -52,33 +71,51 @@ public abstract class Collider implements Serializable, NetObject {
 	public boolean isStatic = false;
 	
 	/**
-	 * Create the collider, and add it to physics
-	 * @param pos the initial position of the Collider
-	 * @param size the initial size of the Collider
-	 * @param velocity the initial velocity of the Collider
-	 * @param layer the initial layer of the Collider
+	 * Create a new collider
+	 * @param layer the physical layer of the collider
 	 */
-	public Collider(Vector pos, Vector size, Vector velocity, int layer) {
-		
-		if(size.x < 0
-				|| size.y < 0) {
-			new Exception("Negative size of collider will produce problems").printStackTrace();
-		}
-		
-		/*
-		 * Set Default for world isStatic
-		 * Set Default for world isBlocking
-		 */
+	public Collider(Integer layer) {
+		this.layer = layer;
 		if(layer == Physics.LAYER_WORLD) {
 			isBlocking = true;
 			isStatic = true;
 		}
+	}
+	
+	/**
+	 * Create a new Collider
+	 * @param layer the physical layer of the collider
+	 * @param isBlocking can other colliders pass through this one?
+	 * @param isStatic can the collider be moved?
+	 */
+	public Collider(Integer layer, Boolean isBlocking, Boolean isStatic) {
+		this(layer);
+		this.isBlocking = isBlocking;
+		this.isStatic = isStatic;
+	}
+	
+	/**
+	 * Create a new Collider
+	 * @param layer the physical layer of the collider
+	 * @param isBlocking can other colliders pass through this one?
+	 * @param isStatic can the collider be moved?
+	 * @param sendCollision can the collider send a collision event to others?
+	 * @param receiveCollision can the collider receive collision event from others?
+	 */
+	public Collider(Integer layer, Boolean isBlocking, Boolean isStatic, Boolean sendCollision, Boolean receiveCollision) {
+		this(layer, isBlocking, isStatic);
+		this.sendCollision = sendCollision;
+		this.receiveCollision = receiveCollision;
+	}
+	
+	
+	@Override
+	public void start() {
 		
-		this.pos = pos;
-		this.size = size;
-		this.velocity = velocity;
+		pos = parent.pos;
+		size = parent.size;
+		velocity = parent.velocity;
 		
-		this.layer = layer;
 		if((layer & ~Physics.RAYCAST_IGNORE) < 0 || (layer & ~Physics.RAYCAST_IGNORE) >= Physics.LAYERS) {
 			new Exception("Invalid layer! Using DEFAULT").printStackTrace();
 			layer = Physics.LAYER_DEFAULT;
@@ -87,14 +124,20 @@ public abstract class Collider implements Serializable, NetObject {
 		Physics.registerCollider(this);
 		
 	}
-	
-	/**
-	 * called once every pyhsicsUpdate
-	 * @param deltaTime time since the last update
-	 */
-	protected final void physicsUpdate(double deltaTime) {
-		pos.x += velocity.x * deltaTime;
-		pos.y += velocity.y * deltaTime;
+
+	@Override
+	public void update(double deltaTime) {
+		
+	}
+
+	@Override
+	public void render() {
+		
+	}
+
+	@Override
+	public void onDestroy() {
+		
 	}
 	
 	/**
@@ -103,37 +146,37 @@ public abstract class Collider implements Serializable, NetObject {
 	public final void draw() {
 		
 		glLineWidth(4f);
-		glColor3d(1, 0, 0);
+		glDisable(GL_TEXTURE_2D);
+		
+		double x = Game.QUAD_SIZE*parent.size.x*0.5d;
+		double y = Game.QUAD_SIZE*parent.size.y*0.5d;
+		
+		if(isBlocking)
+			glColor3d(1, 0, 0);
+		else
+			glColor3d(0, 0, 1);
+		
+		glTranslated(parent.pos.x*Game.QUAD_SIZE, parent.pos.y*Game.QUAD_SIZE, 0);
 		
 		glBegin(GL_LINES);
 		
-		glVertex2d(pos.x * Game.QUAD_SIZE, pos.y * Game.QUAD_SIZE);
-		glVertex2d(pos.x * Game.QUAD_SIZE + size.x * Game.QUAD_SIZE, pos.y * Game.QUAD_SIZE);
+		glVertex2d(-x, -y);
+		glVertex2d(x, -y);
 		
-		glVertex2d(pos.x * Game.QUAD_SIZE, pos.y * Game.QUAD_SIZE);
-		glVertex2d(pos.x * Game.QUAD_SIZE, pos.y * Game.QUAD_SIZE + size.y * Game.QUAD_SIZE);
+		glVertex2d(-x, -y);
+		glVertex2d(-x, y);
 		
-		glVertex2d(pos.x * Game.QUAD_SIZE, pos.y * Game.QUAD_SIZE + size.y * Game.QUAD_SIZE);
-		glVertex2d(pos.x * Game.QUAD_SIZE + size.x * Game.QUAD_SIZE, pos.y * Game.QUAD_SIZE + size.y * Game.QUAD_SIZE);
+		glVertex2d(-x, y);
+		glVertex2d(x, y);
 		
-		glVertex2d(pos.x * Game.QUAD_SIZE + size.x * Game.QUAD_SIZE, pos.y * Game.QUAD_SIZE);
-		glVertex2d(pos.x * Game.QUAD_SIZE + size.x * Game.QUAD_SIZE, pos.y * Game.QUAD_SIZE + size.y * Game.QUAD_SIZE);
+		glVertex2d(x, -y);
+		glVertex2d(x, y);
 		
 		glEnd();
 		
-	}
-	
-	/**
-	 * destroy the collider
-	 */
-	public final void destroy() {
-		pendingDestroy = true;
-		onDestroy();
-	}
-	
-	@Override
-	public final boolean isPendingDestroy() {
-		return pendingDestroy;
+		glTranslated(-(parent.pos.x*Game.QUAD_SIZE), -(parent.pos.y*Game.QUAD_SIZE), 0);
+		glEnable(GL_TEXTURE_2D);
+		
 	}
 	
 	/**
@@ -145,17 +188,28 @@ public abstract class Collider implements Serializable, NetObject {
 	}
 	
 	/**
+	 * Set the physical layer of the object
+	 * @param layer the physical layer of the object
+	 */
+	public final void setLayer(int layer) {
+		this.layer = layer;
+	}
+	
+	/**
 	 * called by physics update in Physics class
-	 * 
-	 * call hit.getHitInfo() for additional object information
 	 * 
 	 * @param hit object hit
 	 */
-	public abstract void onCollision(Collider hit);
-	
-	/**
-	 * Called directly after the object is queued for destruction
-	 */
-	protected abstract void onDestroy();
-	
+	public void onCollision(Collider hit) {
+		
+		ArrayList<Component> components = parent.getComponents();
+		
+		for(int i = 0; i < components.size(); i++) {
+			if(!Collider.class.isAssignableFrom(components.get(i).getClass())) {
+				components.get(i).onCollision(hit);
+			}
+		}
+		
+	}
+
 }

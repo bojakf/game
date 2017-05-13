@@ -2,8 +2,6 @@ package player;
 
 import java.io.Serializable;
 
-import network.NetObject;
-
 /**
  * 
  * This is the interface for all weapons
@@ -11,10 +9,20 @@ import network.NetObject;
  * @author jafi2
  *
  */
-public interface Weapon extends Serializable, NetObject {
+public interface Weapon extends Serializable {
 
 	/*
 	 * TODO improve this (provide basic functionality) 
 	 */
+	
+	/**
+	 * Update the weapon
+	 * @param deltaTime time since last update
+	 */
+	public void update(double deltaTime);
+	/**
+	 * Render the weapon
+	 */
+	public void render();
 	
 }

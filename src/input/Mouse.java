@@ -91,9 +91,13 @@ public class Mouse {
 	private static GLFWScrollCallback scrollCallback;
 	
 	/**
-	 * Last reported position of the mouse. Used to determine the delta between two inputs
+	 * Last reported x-position of the mouse. Used to determine the delta between two inputs
 	 */
-	private static double lx = -1, ly = -1;
+	private static double lx = -1;
+	/**
+	 * Last reported y-position of the mouse. Used to determine the delta between two inputs
+	 */
+	private static double ly = -1;
 	
 	/**
 	 * Initializes the Mouse input<br>
@@ -348,7 +352,18 @@ public class Mouse {
 	 *
 	 */
 	public enum CursorMode {
-		disabled, hidden, normal
+		/**
+		 * the cursor is invisible and grabbed inside the window providing virtual and unlimited cursor movement
+		 */
+		disabled, 
+		/**
+		 * the cursor is invisible as long as the cursor is above the window
+		 */
+		hidden, 
+		/**
+		 * the default cursor behavior
+		 */
+		normal
 	}
 	
 	/**

@@ -4,10 +4,12 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import components.NetComponent;
 import main.Game;
-import map.PlayerSpawn;
+import main.Primitives;
 import physics.Vector;
-import player.Player;
+import components.Player;
+import gameobject.Gameobject;
 
 /**
  * 
@@ -19,21 +21,15 @@ import player.Player;
 public class Network {
 	
 	/*
-	 * TODO rework networking (after component system)
+	 * TODO rework networking
 	 */
 	
 	/*
 	 * TODO do not update correct information compare with cloned objects
-	 * TODO bundle output to one thread (without initialization)
-	 * http://stackoverflow.com/questions/7987395/how-to-write-data-to-two-java-io-outputstream-objects-at-once
 	 */
 	
 	/*
 	 * TODO remove player after disconnect
-	 */
-	
-	/*
-	 * TODO automatically differentiate between netPlayer and netObject and between server and client in on method call
 	 */
 	
 	/**
@@ -67,11 +63,7 @@ public class Network {
 	/**
 	 * All objects updated through network, also contains netPlayers
 	 */
-	protected ArrayList<NetObject> netObjects;
-	/**
-	 * All players on the server
-	 */
-	protected ArrayList<NetPlayer> netPlayers;
+	protected ArrayList<NetComponent> netObjects;
 	
 	/**
 	 * initializes Network
@@ -81,7 +73,6 @@ public class Network {
 	private Network(int playerID, double syncRate) {
 		this.playerID = playerID;
 		netObjects = new ArrayList<>();
-		netPlayers = new ArrayList<>();
 		SYNC_RATE = syncRate;
 	}
 	
@@ -127,23 +118,10 @@ public class Network {
 	}
 	
 	/**
-	 * Renders all network Objects, should be called once per frame
-	 */
-	public void renderNetObjects() {
-		
-		for(int i = 0; i < netObjects.size(); i++) {
-			netObjects.get(i).render();
-		}
-		
-	}
-	
-	/**
-	 * Updates all network Objects, should be called once per frame on the server.<br>
-	 * Clients are not allowed to call this method.<br>
-	 * netObject whose colliders are destroyed are queued for removal in this method
+	 * Updates the network instance (removes destroyed objects)
 	 * @param deltaTime time since last update
 	 */
-	public void updateNetObjects(double deltaTime) {
+	public void updateNet(double deltaTime) {
 		
 		if(isClient()) {
 			new Exception("Clients cannot update objects").printStackTrace();
@@ -151,77 +129,43 @@ public class Network {
 		}
 		
 		for(int i = 0; i < netObjects.size(); i++) {
-			if(netObjects.get(i).isPendingDestroy()) {
+			if(netObjects.get(i).isDestroyed()) {
 				server.removeNetObject(netObjects.get(i));
 				continue;
 			}
-			netObjects.get(i).update(deltaTime);
 		}
 		
 	}
 	
 	/**
-	 * Called by the server in order to add a netObject<br>
-	 * Clients are not allowed to call this method
-	 * @param obj the netObject to add
+	 * Adds a Object to the network
+	 * @param obj the object
 	 */
-	public void registerNetObject(NetObject obj) {
+	public void add(NetComponent obj) {
 		
-		if(isClient()) {
-			new Exception("Clients cannot register objects").printStackTrace();
-			return;
+		if(playerID == 0) {
+			server.sendNetObject(obj);
+		} else {
+			netObjects.add(obj);
+			obj.getParent().init();
 		}
-		
-		server.sendNetObject(obj);
 		
 	}
 	
 	/**
-	 * Called by the server in order to add a netPlayer<br>
-	 * Also spawns the player at his spawnpoint if there is one<br>
-	 * Clients are not allowed to call this method
-	 * @param obj the netPlayer to add
+	 * Creates a new player
+	 * @return the id of the player created
 	 */
-	public void registerNetPlayer(NetPlayer obj) {
+	public int createPlayer() {
 		
-		if(isClient()) {
-			new Exception("Clients cannot register objects").printStackTrace();
-			return;
-		}
+		int playerID = Game.gameobjectsWith(Player.class).size();
 		
-		/*
-		 * TODO improve this
-		 */
-		for(int i = 0; i < netObjects.size(); i++) {
-			NetObject c = netObjects.get(i);
-			if(c instanceof PlayerSpawn && 
-					((PlayerSpawn)c).getPlayerID() == obj.getPlayerID()) {
-				((Player)obj).setPosition(((PlayerSpawn) c).getPosition());
-				((Player)obj).spawn = (PlayerSpawn)c;
-			}
-		}
+		Gameobject player = Primitives.player.create(new Vector(10, 10));
+		((Player)player.getComponent(Player.class)).setPlayerID(playerID);
+		player.init();
 		
-		server.sendNetObject(obj);
+		return playerID;
 		
-	}
-	
-	/**
-	 * Adds loaded netObject to netObject list<br>
-	 * Servers may not call this method
-	 * @param obj the netObject to add
-	 */
-	protected void addNetObject(NetObject obj) {
-		netObjects.add(obj);
-	}
-	
-	/**
-	 * Adds loaded netPlayer to netPlayer list<br>
-	 * Servers may not call this method
-	 * @param obj the netPlayer to add
-	 */
-	protected void addNetPlayer(NetPlayer obj) {
-		netObjects.add(obj);
-		netPlayers.add(obj);
 	}
 	
 	/**
@@ -266,18 +210,6 @@ public class Network {
 		}
 		new Exception("No mouse pos found for player " + playerID).printStackTrace();
 		return null;
-	}
-	
-	/**
-	 * Generates a new player ID<br>
-	 * may return the same number more than once if no player has been created since the last call
-	 * @return the playerID
-	 */
-	/*
-	 * TODO fix this may return the same number more than once if no player has been created since the last call
-	 */
-	public int genPlayerID() {
-		return netPlayers.size();
 	}
 	
 	/**

@@ -51,9 +51,13 @@ public class Main {
 	 */
 	public static final String name = "Game";
 	/**
-	 * The width and height of the window
+	 * The width of the window
 	 */
-	public static final int windowWidth = 1088, windowHeight = 612;
+	public static final int windowWidth = 1088;
+	/**
+	 * The height of the window
+	 */
+	public static final int windowHeight = 612;
 	/**
 	 * zNear for rendering
 	 */
@@ -88,7 +92,7 @@ public class Main {
 	/**
 	 * The main of the Game
 	 * @param args the arguments
-	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException thrown if the errLog.txt or log.txt could not be opened
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		MultiOutStream err = new MultiOutStream();
@@ -196,8 +200,8 @@ public class Main {
 		glClearColor(0, 0, 0, 1);
 		
 //		if(data.isUseDepth()) {
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
+//		glEnable(GL_DEPTH_TEST);
+//		glDepthFunc(GL_LESS);
 //		}
 		glEnable(GL_PROJECTION);
 		glLoadIdentity();
@@ -218,11 +222,8 @@ public class Main {
 		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//FIXME this only allows transparent and not transparent nothing between
-		//FIXME fix this by rendering transparent textures before others (a layer system?)
-		//TODO add layer system
-		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, 0.9f);
+		//glEnable(GL_ALPHA_TEST);
+		//glAlphaFunc(GL_GREATER, 0.9f);
 		
 		glShadeModel(GL_SMOOTH);
 		glEnable(GL15.GL_ARRAY_BUFFER_BINDING);

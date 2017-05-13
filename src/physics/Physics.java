@@ -15,7 +15,7 @@ import org.lwjgl.opengl.GL11;
  */
 public class Physics {
 	
-	/*
+	/**
 	 * Number of available layers
 	 */
 	public static final int LAYERS = 5;
@@ -110,14 +110,15 @@ public class Physics {
 		for(int a = 0; a < colliders.size(); a++) {
 			
 			Collider c = colliders.get(a);
-			if(c == null || c.isPendingDestroy()) {
+			if(c == null || c.isDestroyed()) {
 				colliders.remove(a);
 				a--;
 				continue;
 			}
 			
 			if(c.isStatic) continue;
-			c.physicsUpdate(deltaTime);
+			c.pos.x += c.velocity.x * deltaTime;
+			c.pos.y += c.velocity.y * deltaTime;
 			
 		}
 			
@@ -130,7 +131,7 @@ public class Physics {
 				continue;
 			}
 			
-			if(!c1.reveiveCollision
+			if(!c1.receiveCollision
 					&& !c1.sendCollision)
 				continue;
 			
@@ -145,35 +146,39 @@ public class Physics {
 				
 				if(c1.isStatic && c2.isStatic) continue;
 				
-				if((!c2.reveiveCollision && !c2.sendCollision)
-						|| (!c2.reveiveCollision && !c1.reveiveCollision)
+				if((!c2.receiveCollision && !c2.sendCollision)
+						|| (!c2.receiveCollision && !c1.receiveCollision)
 						|| (!c2.sendCollision && !c1.sendCollision))
 					continue;
 				
 				if(!_canCollide(c1.layer, c2.layer)) continue;
 				
-				if(c1.pos.x <= c2.pos.x + c2.size.x && c1.pos.x + c1.size.x >= c2.pos.x &&
-						c1.pos.y <= c2.pos.y + c2.size.y && c1.pos.y + c1.size.y >= c2.pos.y) {
+				Vector pos1 = new Vector(c1.pos.x - c1.size.x*0.5d, c1.pos.y - c1.size.y*0.5);
+				Vector pos2 = new Vector(c2.pos.x - c2.size.x*0.5d, c2.pos.y - c2.size.y*0.5);
+				
+				if(pos1.x <= pos2.x + c2.size.x && pos1.x + c1.size.x >= pos2.x &&
+						pos1.y <= pos2.y + c2.size.y && pos1.y + c1.size.y >= pos2.y) {
 					
-					if(c1.reveiveCollision && c2.sendCollision) c1.onCollision(colliders.get(b));
-					if(c2.reveiveCollision && c1.sendCollision) c2.onCollision(colliders.get(a));
+					if(c1.receiveCollision && c2.sendCollision) c1.onCollision(colliders.get(b));
+					if(c2.receiveCollision && c1.sendCollision) c2.onCollision(colliders.get(a));
 					
 					
 					
 					/*
 					 * Did one of the colliders get destroyed?
 					 */
-					if(c1.isPendingDestroy()) {
+					if(c1.isDestroyed()) {
 						colliders.remove(a).onDestroy();
 						a--;
 						b--;
 						break;
 					}
-					if(c2.isPendingDestroy()) {
+					if(c2.isDestroyed()) {
 						colliders.remove(b).onDestroy();
 						b--;
 						continue;
 					}
+					
 					
 					/*
 					 * Move colliders outside of each other
@@ -191,25 +196,28 @@ public class Physics {
 								c2 = tmp;
 							}
 						}
-							
-						double mx = c1.pos.x - c2.pos.x;
-						double my = c1.pos.y - c2.pos.y;
+						
+						pos1 = c1.pos;
+						pos2 = c2.pos;
+						
+						double mx = pos1.x - pos2.x;
+						double my = pos1.y - pos2.y;
 						
 						if(mx > 0) {
-							mx = c2.size.x - mx;
+							mx = c2.size.x*0.5+c1.size.x*0.5 - mx;
 						} else {
-							mx = -(mx + c1.size.x);
+							mx = -(mx + c1.size.x*0.5+c2.size.x*0.5);
 						}
 						if(my > 0) {
-							my = c2.size.y - my;
+							my = c2.size.y*0.5+c1.size.y*0.5 - my;
 						} else {
-							my = -(my + c1.size.y);
+							my = -(my + c1.size.y*0.5+c2.size.y*0.5);
 						}
 						
 						if(Math.abs(mx) < Math.abs(my)) {
-							c1.pos.x += mx;
+							pos1.x += mx;
 						} else {
-							c1.pos.y += my;
+							pos1.y += my;
 						}
 					
 					}
@@ -282,8 +290,8 @@ public class Physics {
 			
 			if(!_canCollide(col.layer, layer)) continue;
 			
-			Vector min = new Vector(col.pos.x, col.pos.y);
-			Vector max = new Vector(col.pos.x + col.size.x, col.pos.y + col.size.y);
+			Vector min = new Vector(col.pos.x-col.size.x*0.5, col.pos.y-col.size.y*0.5);
+			Vector max = new Vector(col.pos.x + col.size.x*0.5, col.pos.y + col.size.y*0.5);
 			Vector dis = new Vector(-1,-1);
 			
 			boolean inside = true;
@@ -386,8 +394,8 @@ public class Physics {
 			
 			if(ignore.contains(col)) continue;
 			
-			Vector min = new Vector(col.pos.x, col.pos.y);
-			Vector max = new Vector(col.pos.x + col.size.x, col.pos.y + col.size.y);
+			Vector min = new Vector(col.pos.x-col.size.x*0.5, col.pos.y-col.size.y*0.5);
+			Vector max = new Vector(col.pos.x + col.size.x*0.5, col.pos.y + col.size.y*0.5);
 			Vector dis = new Vector(-1,-1);
 			
 			boolean inside = true;
@@ -468,8 +476,8 @@ public class Physics {
 			
 			Collider c = colliders.get(i);
 			
-			Vector p1 = new Vector(c.pos.x - pos.x, c.pos.y - pos.y);
-			Vector p2 = new Vector(c.pos.x + c.size.x - pos.x, c.pos.y + c.size.y - pos.y);
+			Vector p1 = new Vector(c.pos.x-c.size.x*0.5 - pos.x, c.pos.y-c.size.y*0.5 - pos.y);
+			Vector p2 = new Vector(c.pos.x+c.size.x*0.5 - pos.x, c.pos.y+c.size.y*0.5 - pos.y);
 			Vector p3 = new Vector(p2.x, p1.y);
 			Vector p4 = new Vector(p1.x, p2.y);
 			

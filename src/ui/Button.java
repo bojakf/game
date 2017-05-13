@@ -16,8 +16,17 @@ import rendering.StringDrawer;
  */
 public class Button extends UiObject {
 	
+	/**
+	 * Texture name for clicked button
+	 */
 	public static final String STD_CLICKED_TEX = "button_clicked";
+	/**
+	 * Texture name for mouse over button
+	 */
 	public static final String STD_MOUSE_OVER_TEX = "button_mouseOver";
+	/**
+	 * Texture name for normal button
+	 */
 	public static final String STD_NORMAL_TEX = "button_normal";
 	
 	/**
@@ -103,10 +112,7 @@ public class Button extends UiObject {
 	@Override
 	protected void render() {
 		
-		glColor4d(1, 1, 1, 1);
-		
-		StringDrawer.drawStringCentered(text, (float)(pos.x + size.x/2), (float)(pos.y + size.y/2));
-		
+		glColor4d(1, 1, 1, 1);		
 		
 		if(clicked) {
 			TexManager.bindTex(clickedTex);
@@ -131,6 +137,8 @@ public class Button extends UiObject {
 		glVertex2d(pos.x, pos.y);
 		
 		glEnd();
+		
+		StringDrawer.drawStringCentered(text, (float)(pos.x + size.x/2), (float)(pos.y + size.y/2));
 		
 	}
 	

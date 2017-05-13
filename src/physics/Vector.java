@@ -18,9 +18,13 @@ public class Vector implements Serializable, Cloneable {
 	
 	
 	/**
-	 * x and y values of vector
+	 * x value of vector
 	 */
-	public double x=0, y=0;
+	public double x=0;
+	/**
+	 * y value of vector
+	 */
+	public double y=0;
 	
 	/**
 	 * Create Vector using specified values
@@ -46,6 +50,15 @@ public class Vector implements Serializable, Cloneable {
 			x /= l;
 			y /= l;
 		}
+	}
+	
+	/**
+	 * Set the values of this vector equal to the ones from the vector provided
+	 * @param v the vector provided
+	 */
+	public void set(Vector v) {
+		x = v.x;
+		y = v.y;
 	}
 	
 	/**

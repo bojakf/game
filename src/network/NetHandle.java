@@ -3,17 +3,13 @@ package network;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.lwjgl.glfw.GLFW;
 
 import input.Keyboard;
 import input.Mouse;
-import main.Game;
 import physics.Vector;
 
 /**
@@ -30,10 +26,6 @@ public class NetHandle {
 	 */
 	private boolean stop = false;
 	
-	/**
-	 * Thread handling output to the client
-	 */
-	private Thread outThread;
 	/**
 	 * Thread handling input from the client
 	 */
@@ -76,7 +68,6 @@ public class NetHandle {
 		this.out = out;
 		this.in = in;
 		inThread = new Thread(inRunnable, "Client " + playerID + " in");
-		outThread.start();
 		inThread.start();
 	}
 	

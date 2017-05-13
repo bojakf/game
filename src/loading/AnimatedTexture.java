@@ -1,11 +1,8 @@
-package rendering;
+package loading;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-
-import loading.TexManager;
-import main.Game;
 
 /**
  * 
@@ -14,6 +11,7 @@ import main.Game;
  * The first textures has to have the name 1.png
  * 
  * TODO don't make this class serializable
+ * TODO implement destroy code
  * 
  * @author jafi2
  *
@@ -47,7 +45,7 @@ public class AnimatedTexture implements Cloneable, Serializable {
 	 * @param location the location of the folder containing the images
 	 * @param fps the number of frames per second
 	 */
-	public AnimatedTexture(String location, int fps) {
+	AnimatedTexture(String location, int fps) {
 		
 		frameTime = 1d/fps;
 		File folder = new File(location);
@@ -94,6 +92,7 @@ public class AnimatedTexture implements Cloneable, Serializable {
 	
 	/**
 	 * Get the total length of the animation
+	 * @return the duration of the animation
 	 */
 	public double getDuration() {
 		return frameTime * texNames.length;

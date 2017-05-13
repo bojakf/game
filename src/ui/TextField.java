@@ -148,11 +148,6 @@ public abstract class TextField extends UiObject {
 		cursorPos = text.length();
 		
 		glColor4d(1, 1, 1, 1);
-		
-		if(selected && (selectedTime-(int)selectedTime)<0.5d) {
-			StringDrawer.drawString("_", cursorPos*StringDrawer.letterWidth + pos.x + 10, pos.y + size.y/2 - StringDrawer.letterHeight/2d);
-		}
-		StringDrawer.drawString(text.toString(), pos.x + 10, pos.y + size.y/2 - StringDrawer.letterHeight/2d);
 		glDisable(GL_TEXTURE_2D);
 		
 		glBegin(GL_QUADS);
@@ -173,6 +168,13 @@ public abstract class TextField extends UiObject {
 		glEnd();
 		
 		glEnable(GL_TEXTURE_2D);
+		
+		glColor4d(1, 1, 1, 1);
+		
+		if(selected && (selectedTime-(int)selectedTime)<0.5d) {
+			StringDrawer.drawString("_", cursorPos*StringDrawer.letterWidth + pos.x + 10, pos.y + size.y/2 - StringDrawer.letterHeight/2d);
+		}
+		StringDrawer.drawString(text.toString(), pos.x + 10, pos.y + size.y/2 - StringDrawer.letterHeight/2d);
 		
 	}
 	

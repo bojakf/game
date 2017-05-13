@@ -6,6 +6,8 @@ import java.util.HashMap;
  * 
  * Manages loaded textures
  * 
+ * TODO add method to remove animated textures and unload them
+ * 
  * @author jafi2
  *
  */
@@ -15,6 +17,10 @@ public class TexManager {
 	 * saves all loaded textures with their name
 	 */
 	private static HashMap<String, Texture> textures = new HashMap<String, Texture>();
+	/**
+	 * saves all loaded animation with their name
+	 */
+	private static HashMap<String, AnimatedTexture> animations = new HashMap<>();
 	
 	/**
 	 * This class contains only static methods
@@ -30,11 +36,37 @@ public class TexManager {
 	public static void loadTex(String name, String location) {
 		
 		if(textures.containsKey(name)) {
-			new Exception("Texture Name already used").printStackTrace();
+			new Exception("Texture Name already used:" + name).printStackTrace();
 			return;
 		}
 		textures.put(name, TextureLoader.load(location));
 	
+	}
+	
+	/**
+	 * Load a new Animation
+	 * @param name the name of the animation
+	 * @param location the folder containing the animation. <br> The textures must have the following file structure: [location]\[number of image].png
+	 * @param fps the number of frames per second the animation has
+	 */
+	public static void loadAnimation(String name, String location, int fps) {
+		
+		if(animations.containsKey(name)) {
+			throw new RuntimeException("animation Name already used: " + name);
+		}
+		animations.put(name, new AnimatedTexture(location, fps));
+		
+	}
+	
+	/**
+	 * Returns a cloned object of the animation
+	 * @param name name of the animation
+	 * @return the cloned Animation
+	 */
+	public static AnimatedTexture getAnimation(String name) {
+		if(!animations.containsKey(name))
+			throw new RuntimeException("No animation with name: " + name);
+		return animations.get(name).clone();
 	}
 	
 	/**

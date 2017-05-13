@@ -4,11 +4,13 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import components.NetComponent;
 import input.Keyboard;
 import input.Keyboard.CharListener;
 import input.Keyboard.KeyListener;
@@ -272,15 +274,14 @@ public class NetClient {
 					if(command == NetCommands.DISCONNECT) {
 						break;
 					} else if(command == NetCommands.ADD_OBJECT) {
-						Game.net.addNetObject((NetObject) in.readObject());
-					} else if(command == NetCommands.ADD_PLAYER) {
-						NetPlayer p = (NetPlayer) in.readObject();
-						Game.net.addNetPlayer(p);
+						NetComponent n =((NetComponent)in.readObject());
+						n.getParent().init();
+						Game.net.netObjects.add(n);
 					} else if(command == NetCommands.UPDATE_OBJECT) {
 						
 						int id = in.readInt();
 						int size = in.readInt();
-						ArrayList<Serializable> data = new ArrayList<>();
+						ArrayList<Serializable> data = new ArrayList<>(size);
 						
 						for(int i = 0; i < size; i++) {
 							data.add((Serializable)in.readObject());
@@ -291,21 +292,20 @@ public class NetClient {
 					} else if(command == NetCommands.REMOVE_OBJECT) {
 						
 						int id = in.readInt();
-						NetObject obj = Game.net.netObjects.get(id);
-						if(obj instanceof NetPlayer) {
-							Game.net.netPlayers.remove(obj);
-						}
-						Game.net.netObjects.remove(id);
+						NetComponent obj = Game.net.netObjects.remove(id);
+						obj.getParent().destroy();
 						
+					} else {
+						throw new RuntimeException("Unknown Command: " + command);
 					}
 					
 					
 				} catch (EOFException e) {
 					e.printStackTrace();
 					break;
-				} catch (IOException e) {
-					e.printStackTrace();
 				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				

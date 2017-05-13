@@ -1,12 +1,11 @@
 package player.weapon;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 import input.Mouse;
 import main.Game;
+import main.Primitives;
 import physics.Vector;
-import player.Player;
+import components.Player;
+import gameobject.Gameobject;
 import player.Weapon;
 import ui.Ui;
 
@@ -27,7 +26,7 @@ public class GrenadeLauncher implements Weapon {
 	/**
 	 * The time required to reload
 	 */
-	private static final double RELOAD_TIME = 0.00001;
+	private static final double RELOAD_TIME = 1;
 	
 	/**
 	 * The player this weapon belongs to
@@ -36,7 +35,7 @@ public class GrenadeLauncher implements Weapon {
 	/**
 	 * The time since the last shot
 	 */
-	private double shotTime = 0;
+	private double shotTime;
 	
 	/**
 	 * Create a new Grenade Launcher
@@ -56,9 +55,11 @@ public class GrenadeLauncher implements Weapon {
 			Vector m = Mouse.xy(player.getPlayerID());
 			m.x /= Game.QUAD_SIZE;
 			m.y /= Game.QUAD_SIZE;
-			m.x -= Grenade.SIZE.x/2;
-			m.y -= Grenade.SIZE.y/2;
-			new Grenade(Vector.add(player.getPosition(), new Vector(player.getSize().x/2, player.getSize().y/2)), m);
+			
+			Gameobject grenade = Primitives.grenade.create(player.getParent().pos, Grenade.SIZE);
+			((Grenade)grenade.getComponent(Grenade.class)).setDestination(m);
+			grenade.init();
+			
 		}
 		
 	}
@@ -66,22 +67,6 @@ public class GrenadeLauncher implements Weapon {
 	@Override
 	public void render() {
 		
-	}
-	
-	@Override
-	public boolean isPendingDestroy() {
-		return false;
-	}
-	
-	@Override
-	public void sendNetUpdate(ArrayList<Serializable> data) {
-		
-	}
-
-	@Override
-	public void receiveNetUpdate(ArrayList<Serializable> data) {
-		
-	}
-	
+	}	
 	
 }
