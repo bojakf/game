@@ -1,16 +1,17 @@
 package main;
 
 import components.Effect;
-import components.FinalNetComponent;
 import components.FinalRenderer;
+import components.HealthPack;
 import components.Player;
 import components.Renderer;
 import components.Spawn;
 import gameobject.Primitive;
 import loading.TexManager;
+import mapCreator.MapCreator;
 import physics.Collider;
 import physics.Physics;
-import player.weapon.Grenade;
+import weapon.Grenade;
 
 /**
  * 
@@ -24,7 +25,7 @@ public class Primitives {
 	/**
 	 * Contains only static fields
 	 */
-	public Primitives() {}
+	private Primitives() {}
 	
 	/**
 	 * primitive for a map wall
@@ -55,14 +56,18 @@ public class Primitives {
 	 */
 	public static final Primitive crater;
 	
+	public static final Primitive healthPack;
+	
 	static {
 		
 		mapWall = new Primitive(Game.L_WALL);
 		mapWall.addComponent(FinalRenderer.class, "wall");
 		mapWall.addComponent(Collider.class, Physics.LAYER_WORLD);
+		MapCreator.mapObjects.add(mapWall);
 		
 		mapFloor = new Primitive(Game.L_FLOOR);
 		mapFloor.addComponent(FinalRenderer.class, "grass");
+		MapCreator.mapObjects.add(mapFloor);
 		
 		player = new Primitive(Game.L_PLAYER);
 		player.addComponent(Renderer.class, TexManager.getAnimation("player"));
@@ -72,6 +77,8 @@ public class Primitives {
 		spawn = new Primitive(Game.L_DECO);
 		spawn.addComponent(Collider.class, Physics.LAYER_WORLD | Physics.RAYCAST_IGNORE);
 		spawn.addComponent(Spawn.class);
+		spawn.addComponent(Renderer.class, "playerSpawn");
+		MapCreator.mapObjects.add(spawn);
 		
 		grenade = new Primitive(Game.L_WEAPONS);
 		grenade.addComponent(Collider.class, Physics.LAYER_ENEMY | Physics.RAYCAST_IGNORE);
@@ -83,6 +90,12 @@ public class Primitives {
 		
 		crater = new Primitive(Game.L_EFFECT_2);
 		crater.addComponent(Effect.class, "crater", 20d);
+		
+		healthPack = new Primitive(Game.L_WEAPONS);
+		healthPack.addComponent(Renderer.class, "healthPack");
+		healthPack.addComponent(HealthPack.class);
+		healthPack.addComponent(Collider.class, Physics.LAYER_WORLD | Physics.RAYCAST_IGNORE, false, true);
+		MapCreator.mapObjects.add(healthPack);
 		
 	}
 	

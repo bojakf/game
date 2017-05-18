@@ -12,15 +12,28 @@ import loading.AnimatedTexture;
  */
 public class Effect extends Renderer {
 	
+	/*
+	 * TODO way to disable fade
+	 */
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 3072906034179668427L;
 	
 	/**
+	 * Percentage of ttl left when starting to fade
+	 */
+	public static final double FADE_START = 0.1;
+	
+	/**
 	 * Time until the effect ends (time to live)
 	 */
 	protected double ttl;
+	/**
+	 * Time until the fade starts
+	 */
+	protected double fadeStart = 0;
 	
 	/**
 	 * Creates a new effect
@@ -30,6 +43,7 @@ public class Effect extends Renderer {
 	public Effect(String texName, Double ttl) {
 		super(texName);
 		this.ttl = ttl;
+		this.fadeStart = ttl * FADE_START;
 	}
 	
 	/**
@@ -57,6 +71,8 @@ public class Effect extends Renderer {
 		ttl-=deltaTime;
 		if(ttl < 0) {
 			parent.destroy();
+		} else if(ttl < fadeStart) {
+			col.a = ttl/fadeStart;
 		}
 	}
 	

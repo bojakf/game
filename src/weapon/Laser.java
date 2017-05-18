@@ -1,4 +1,4 @@
-package player.weapon;
+package weapon;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -16,7 +16,6 @@ import physics.Ray;
 import physics.RaycastHit;
 import physics.Vector;
 import components.Player;
-import player.Weapon;
 import rendering.Color;
 
 /**

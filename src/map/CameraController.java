@@ -18,10 +18,16 @@ public class CameraController {
 
 	public static double mapSizeX = 0;
 	public static double mapSizeY = 0;
+	public static double mapX = 0;
+	public static double mapY = 0;
+	
+	public static boolean active = true;
 	
 	private Player player = null;
 	
 	public void update(double deltaTime) {
+		
+		if(!active) return;
 		
 		if(player == null) {
 			ArrayList<Gameobject> g = Game.gameobjectsWith(Player.class);
@@ -50,13 +56,14 @@ public class CameraController {
 	
 	public static final Vector calcCamPos(Player player) {
 		
+		//TODO improve this
 		double x = player.getPosition().x - Game.QUADS_X*0.5;
 		double y = player.getPosition().y - Game.QUADS_Y*0.5;
 		
-		x = Math.max(x, 0);
-		y = Math.max(y, 0);
-		x = Math.min(x, mapSizeX-Math.floor(Game.QUADS_X));
-		y = Math.min(y, mapSizeY-Math.floor(Game.QUADS_Y));
+//		x = Math.max(x, mapX);
+//		y = Math.max(y, mapY);
+//		x = Math.min(x, mapX+mapSizeX-Math.floor(Game.QUADS_X));
+//		y = Math.min(y, mapY+mapSizeY-Math.floor(Game.QUADS_Y));
 		
 		return new Vector(x, y);
 		

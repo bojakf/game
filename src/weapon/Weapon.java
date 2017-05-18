@@ -1,4 +1,4 @@
-package player;
+package weapon;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import org.lwjgl.opengl.GL11;
 
+import utility.Mathd;
+
 /**
  * 
  * Class representing a RGBA color
@@ -61,10 +63,25 @@ public class Color implements Serializable {
 	}
 	
 	/**
+	 * Clamps color values between 0 and 1
+	 */
+	public void normalize() {
+		r = Mathd.clamp(r, 0, 1);
+		g = Mathd.clamp(g, 0, 1);
+		b = Mathd.clamp(b, 0, 1);
+		a = Mathd.clamp(a, 0, 1);
+	}
+	
+	/**
 	 * use the color to render
 	 */
 	public void glColor() {
 		GL11.glColor4d(r, g, b, a);
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("r:%.4f g:%.4f b:%.4f a:%.4f", r, g, b, a);
 	}
 	
 }

@@ -32,7 +32,7 @@ public abstract class Component implements Serializable {
 	/**
 	 * has the start method already been called
 	 */
-	private boolean intialized = false;
+	private transient boolean intialized = false;
 	/**
 	 * has the component been removed from it's parent or has the parent been destroyed
 	 */
@@ -114,6 +114,7 @@ public abstract class Component implements Serializable {
 	 * the garbage collector removes the component.
 	 */
 	public void destroy() {
+		if(destroyed) return;
 		destroyed = true;
 		onDestroy();
 	}

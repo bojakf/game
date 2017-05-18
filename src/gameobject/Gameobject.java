@@ -95,6 +95,11 @@ public class Gameobject implements Serializable {
 		if(destroyed) return;
 		
 		for(int i = 0; i < components.size(); i++) {
+			if(components.get(i).isDestroyed()) {
+				components.remove(i);
+				i--;
+				continue;
+			}
 			if(!components.get(i).isIntialized()) components.get(i).initialize();
 			components.get(i).update(deltaTime);
 		}
@@ -117,6 +122,7 @@ public class Gameobject implements Serializable {
 	 * Destroy the gameobject and all it's components
 	 */
 	public void destroy() {
+		if(destroyed) return;
 		for(int i = 0; i < components.size(); i++) {
 			components.get(i).destroy();
 		}
@@ -180,6 +186,7 @@ public class Gameobject implements Serializable {
 			throw new RuntimeException("Gameobject already contains this component");
 		}
 		
+		component.setParent(this);
 		components.add(component);
 		
 	}

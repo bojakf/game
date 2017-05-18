@@ -9,6 +9,7 @@ import loading.AnimatedTexture;
 import loading.TexManager;
 import main.Game;
 import physics.Vector;
+import rendering.Color;
 
 /**
  * 
@@ -34,6 +35,11 @@ public class Renderer extends NetComponent {
 	 * null if a texture is used
 	 */
 	private AnimatedTexture tex = null;
+	
+	/**
+	 * the color the render uses to render
+	 */
+	public Color col = new Color();
 	
 	/**
 	 * Create a new Renderer Component with a texture
@@ -75,7 +81,7 @@ public class Renderer extends NetComponent {
 		double x = Game.QUAD_SIZE*parent.size.x*0.5d;
 		double y = Game.QUAD_SIZE*parent.size.y*0.5d;
 		
-		glColor3d(1, 1, 1);
+		col.glColor();
 		glTranslated(parent.pos.x*Game.QUAD_SIZE, parent.pos.y*Game.QUAD_SIZE, 0);
 		
 		glBegin(GL_QUADS);
@@ -119,6 +125,22 @@ public class Renderer extends NetComponent {
 		if(tex != null) {
 			 tex.curTex = (int) data.remove(0);
 		}
+	}
+
+	public String getTex() {
+		return texName;
+	}
+
+	public AnimatedTexture getAnimation() {
+		return tex;
+	}
+	
+	public void setTex(String tex) {
+		this.texName = tex;
+	}
+	
+	public void setAnimation(AnimatedTexture animation) {
+		this.tex = animation;
 	}
 
 }

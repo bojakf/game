@@ -15,6 +15,7 @@ import loading.TexManager;
 import main.Game;
 import physics.Collider;
 import physics.Vector;
+import rendering.Color;
 
 /**
  * 
@@ -43,6 +44,16 @@ public class Spawn extends NetComponent {
 		
 		((Collider)parent.getComponent(Collider.class)).isBlocking = false;
 		
+		if(playerID == 0) {
+			((Renderer)parent.getComponent(Renderer.class)).col = new Color(1, 0, 0);
+		} else if(playerID == 1) {
+			((Renderer)parent.getComponent(Renderer.class)).col = new Color(0, 1, 0);
+		} else if(playerID == 2) {
+			((Renderer)parent.getComponent(Renderer.class)).col = new Color(0, 0, 1);
+		} else if(playerID == 3) {
+			((Renderer)parent.getComponent(Renderer.class)).col = new Color(1, 1, 0);
+		}
+				
 	}
 
 	@Override
@@ -52,41 +63,6 @@ public class Spawn extends NetComponent {
 
 	@Override
 	public void render() {
-		
-		if(playerID == 0) {
-			glColor3d(1, 0, 0);
-		} else if(playerID == 1) {
-			glColor3d(0, 1, 0);
-		} else if(playerID == 2) {
-			glColor3d(0, 0, 1);
-		} else if(playerID == 3) {
-			glColor3d(1, 1, 0);
-		}
-		
-		TexManager.bindTex("playerSpawn");
-		
-		double x = Game.QUAD_SIZE*parent.size.x*0.5d;
-		double y = Game.QUAD_SIZE*parent.size.y*0.5d;
-		
-		glTranslated(parent.pos.x*Game.QUAD_SIZE, parent.pos.y*Game.QUAD_SIZE, 0);
-		
-		glBegin(GL_QUADS);
-		
-		glTexCoord2d(0, 0);
-		glVertex2d(-x, y);
-		
-		glTexCoord2d(1, 0);
-		glVertex2d(x, y);
-		
-		glTexCoord2d(1, 1);
-		glVertex2d(x, -y);
-		
-		glTexCoord2d(0, 1);
-		glVertex2d(-x, -y);
-		
-		glEnd();
-		
-		glTranslated(-(parent.pos.x*Game.QUAD_SIZE), -(parent.pos.y*Game.QUAD_SIZE), 0);
 		
 	}
 

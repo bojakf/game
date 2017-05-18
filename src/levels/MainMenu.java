@@ -4,8 +4,10 @@ import java.net.UnknownHostException;
 
 import main.Game;
 import main.Main;
+import mapCreator.MapCreator;
 import physics.Vector;
 import ui.Button;
+import ui.Button.ClickListener;
 import ui.Ui;
 
 /**
@@ -29,7 +31,7 @@ public class MainMenu extends Level {
 		
 		ui = new Ui();
 		
-		Button bCreateServer = new Button(ui, new Button.ClickListener() {
+		Button bCreateServer = new Button(ui, new ClickListener() {
 			
 			@Override
 			public void onClick() {
@@ -44,7 +46,7 @@ public class MainMenu extends Level {
 		bCreateServer.size = new  Vector(400, 40);
 		bCreateServer.text = "Create Server";
 		
-		Button bJoinServer = new Button(ui, new Button.ClickListener() {
+		Button bJoinServer = new Button(ui, new ClickListener() {
 			
 			@Override
 			public void onClick() {
@@ -55,7 +57,7 @@ public class MainMenu extends Level {
 		bJoinServer.size = new  Vector(400, 40);
 		bJoinServer.text = "Join Server";	
 		
-		Button bSettings = new Button(ui, new Button.ClickListener() {
+		Button bSettings = new Button(ui, new ClickListener() {
 			
 			@Override
 			public void onClick() {
@@ -65,6 +67,17 @@ public class MainMenu extends Level {
 		bSettings.pos = new Vector(Main.windowWidth/2-200, Main.windowHeight-220);
 		bSettings.size = new Vector(400, 40);
 		bSettings.text = "Settings";
+		
+		Button bMapCreator = new Button(ui, new ClickListener() {
+			
+			@Override
+			public void onClick() {
+				Game.changeLevel(new MapCreator());
+			}
+		});
+		bMapCreator.pos = new Vector(Main.windowWidth/2-200, Main.windowHeight-280);
+		bMapCreator.size = new Vector(400, 40);
+		bMapCreator.text = "Map Creator";
 		
 	}
 	

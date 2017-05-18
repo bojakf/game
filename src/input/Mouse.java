@@ -100,6 +100,11 @@ public class Mouse {
 	private static double ly = -1;
 	
 	/**
+	 * HashMap containing mouse Button States for all players
+	 */
+	private static HashMap<Integer, HashMap<Integer, Boolean>> mouseButtonDown = new HashMap<>();
+	
+	/**
 	 * Initializes the Mouse input<br>
 	 * this class should not be used without calling this method first
 	 * @param window the id of the openGL window
@@ -194,11 +199,21 @@ public class Mouse {
 						mb.onPress(button, mods);
 					}
 					
+					if(!mouseButtonDown.containsKey(LOCAL)) {
+						mouseButtonDown.put(LOCAL, new HashMap<>());
+					}
+					mouseButtonDown.get(LOCAL).put(button, true);
+					
 				} else if(action == GLFW_RELEASE) {
 					
 					for(MouseListener mb : mbls) {
 						mb.onRelease(button, mods);
 					}
+					
+					if(!mouseButtonDown.containsKey(LOCAL)) {
+						mouseButtonDown.put(LOCAL, new HashMap<>());
+					}
+					mouseButtonDown.get(LOCAL).put(button, false);
 					
 				}
 				
@@ -377,6 +392,11 @@ public class Mouse {
 		for(int i = 0; a != null && i < a.size(); i++) {
 			a.get(i).onPress(button, modifiers);
 		}
+		
+		if(!mouseButtonDown.containsKey(playerID)) {
+			mouseButtonDown.put(playerID, new HashMap<>());
+		}
+		mouseButtonDown.get(playerID).put(button, true);
 	}
 	
 	/**
@@ -390,6 +410,11 @@ public class Mouse {
 		for(int i = 0; a != null && i < a.size(); i++) {
 			a.get(i).onRelease(button, modifiers);
 		}
+		
+		if(!mouseButtonDown.containsKey(playerID)) {
+			mouseButtonDown.put(playerID, new HashMap<>());
+		}
+		mouseButtonDown.get(playerID).put(button, false);
 	}
 	
 	/**
@@ -489,6 +514,22 @@ public class Mouse {
 	public static boolean removeMouseButtonListener(MouseListener mb, int playerID) {
 		if(!mouseButtonListeners.containsKey(playerID)) return false;
 		return mouseButtonListeners.get(playerID).remove(mb);
+	}
+	
+	/**
+	 * Check if a mouse button is down
+	 * @param button the number of the mouse button
+	 * @param playerID the id of the player<br>use Mouse.LOCAL for local input
+	 * @return is the button down?
+	 */
+	public static boolean isMouseButtonDown(int button, int playerID) {
+		if(Game.net != null && playerID == Game.net.playerID) playerID = LOCAL;
+		
+		if(!mouseButtonDown.containsKey(playerID)) return false;
+		if(mouseButtonDown.get(playerID).containsKey(button)) {
+			return mouseButtonDown.get(playerID).get(button);
+		}
+		return false;
 	}
 	
 	/**

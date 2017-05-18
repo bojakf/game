@@ -249,16 +249,16 @@ public class NetServer {
 					
 				if(1/deltaTime > Game.net.SYNC_RATE) {
 					double sleepTime = (1/Game.net.SYNC_RATE - deltaTime)*1000;
-//					try {
-//						Thread.sleep((long) sleepTime);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
+					try {
+						Thread.sleep((long) sleepTime);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					now = System.nanoTime();
 					deltaTime = (now-last)/1000000000d;
 				}
 				last = now;
-				System.out.println(1/deltaTime);
+//				System. out.println(1/deltaTime);
 				/*
 				 * Add new clients to update multiStream
 				 */

@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import debug.Debug;
 import gameobject.Component;
 import gameobject.Gameobject;
+import gameobject.Primitive;
 import levels.Level;
 import levels.MainMenu;
 import loading.TexManager;
@@ -203,6 +204,14 @@ public class Game {
 		TexManager.loadTex("playerSpawn", gamePath + "textures\\playerSpawn.png");
 		TexManager.loadTex("grenade", gamePath + "textures\\grenade.png");
 		TexManager.loadTex("crater", gamePath + "textures\\crater.png");
+		TexManager.loadTex("reload", gamePath + "textures\\reload.png");
+		TexManager.loadTex("healthPack", gamePath + "textures\\healthPack.jpg");
+		
+		/*
+		 * Execute static block of Primitives in order to prevent problems with map creator
+		 */
+		@SuppressWarnings("unused")
+		Primitive tmp = Primitives.mapFloor;
 		
 		gameobjects = new ArrayList<>();
 		for(int i = 0; i < LAYERS; i++) {
@@ -270,6 +279,27 @@ public class Game {
 	}
 	
 	/**
+	 * Get an array containing all gameobjects<br>
+	 * Array starts with gameobjects in the highest layer and ends with lowest layer
+	 * @return array containing all gameobjects
+	 */
+	public static Gameobject[] getGameobjects() {
+		int size = 0;
+		for(int i = 0; i < gameobjects.size(); i++) {
+			size+=gameobjects.get(i).size();
+		}
+		Gameobject[] g = new Gameobject[size];
+		int c = 0;
+		for(int i = gameobjects.size()-1; i >= 0; i--) {
+			for(int a = 0; a < gameobjects.get(i).size() && c < g.length; a++) {
+				g[c] = gameobjects.get(i).get(a);
+				c++;
+			}
+		}
+		return g;
+	}
+	
+	/**
 	 * Update the Game<br>
 	 * called by Main<br>
 	 * all updates should be done in here
@@ -310,7 +340,6 @@ public class Game {
 				g.get(i).render();
 			}
 		}
-		Physics.drawColliders();
 		Debug.renderDebug();
 		GL11.glTranslated(camX*QUAD_SIZE-WORLD_OFFSET_X*QUAD_SIZE, camY*QUAD_SIZE-WORLD_OFFSET_X*QUAD_SIZE, 0);
 		

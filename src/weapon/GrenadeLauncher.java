@@ -1,4 +1,4 @@
-package player.weapon;
+package weapon;
 
 import input.Mouse;
 import main.Game;
@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import components.Player;
 import gameobject.Gameobject;
-import player.Weapon;
 import ui.Ui;
 
 /**

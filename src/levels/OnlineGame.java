@@ -2,11 +2,14 @@ package levels;
 
 import java.net.InetAddress;
 
+import org.lwjgl.opengl.GL11;
+
 import components.Player;
 import gameobject.Gameobject;
 import main.Game;
 import main.Main;
 import main.Primitives;
+import map.CameraController;
 import map.Map;
 import network.Network;
 import physics.Physics;
@@ -34,8 +37,8 @@ public class OnlineGame extends Level {
 	public OnlineGame(InetAddress serverAdress, int port) {
 		
 		Game.net = Network.connectToServer(serverAdress, port);
-		Game.camController.mapSizeX = Game.QUADS_X*2;
-		Game.camController.mapSizeY = Game.QUADS_Y*2;
+		CameraController.mapSizeX = Game.QUADS_X*2;
+		CameraController.mapSizeY = Game.QUADS_Y*2;
 		
 	}
 	
@@ -65,7 +68,9 @@ public class OnlineGame extends Level {
 
 	@Override
 	public void render() {
-		
+		GL11.glTranslated(-Game.camX*Game.QUAD_SIZE+Game.WORLD_OFFSET_X*Game.QUAD_SIZE, -Game.camY*Game.QUAD_SIZE+Game.WORLD_OFFSET_X*Game.QUAD_SIZE, 0);
+		Physics.drawColliders();
+		GL11.glTranslated(Game.camX*Game.QUAD_SIZE-Game.WORLD_OFFSET_X*Game.QUAD_SIZE, Game.camY*Game.QUAD_SIZE-Game.WORLD_OFFSET_X*Game.QUAD_SIZE, 0);
 	}
 
 	@Override

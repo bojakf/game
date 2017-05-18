@@ -19,11 +19,11 @@ import gameobject.Gameobject;
 import input.Keyboard;
 import main.Game;
 import physics.Vector;
-import player.Weapon;
-import player.weapon.GrenadeLauncher;
-import player.weapon.Laser;
 import rendering.Color;
 import rendering.StringDrawer;
+import weapon.GrenadeLauncher;
+import weapon.Laser;
+import weapon.Weapon;
 
 /**
  * 
