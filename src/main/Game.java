@@ -15,7 +15,6 @@ import levels.MainMenu;
 import loading.TexManager;
 import map.CameraController;
 import network.Network;
-import physics.Physics;
 
 /**
  * 
@@ -29,6 +28,10 @@ import physics.Physics;
 public class Game {
 	
 	/*
+	 * TODO knockback weapon
+	 * TODO grenade knockback
+	 */
+	/*
 	 * TODO system for saving options
 	 */
 	/*
@@ -41,10 +44,6 @@ public class Game {
 	 * TODO add taskbar icon
 	 */
 	/*
-	 * TODO add map creator level
-	 * TODO save maps and load during server creation
-	 */
-	/*
 	 * TODO maybe add option to use multicast to send server updates to the clients
 	 */
 	/*
@@ -54,10 +53,10 @@ public class Game {
 	 * TODO texture packs
 	 */
 	/*
-	 * TODO replace new Exception().printStackTrace() with throw new RuntimeException();
+	 * TODO weapons as components?
 	 */
 	/*
-	 * TODO weapons as components?
+	 * TODO (networking interpolation for low framerates)
 	 */
 	
 	/**
@@ -206,6 +205,10 @@ public class Game {
 		TexManager.loadTex("crater", gamePath + "textures\\crater.png");
 		TexManager.loadTex("reload", gamePath + "textures\\reload.png");
 		TexManager.loadTex("healthPack", gamePath + "textures\\healthPack.jpg");
+		TexManager.loadTex("rocket", gamePath + "textures\\rocket.png");
+		TexManager.loadTex("rocketLauncher", gamePath + "textures\\rocket_launcher.png");
+		TexManager.loadTex("laser", gamePath + "textures\\laser.png");
+		TexManager.loadTex("grenadeLauncher", gamePath + "textures\\grenade_launcher.png");
 		
 		/*
 		 * Execute static block of Primitives in order to prevent problems with map creator

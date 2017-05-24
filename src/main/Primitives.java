@@ -1,5 +1,6 @@
 package main;
 
+import components.Damageable;
 import components.Effect;
 import components.FinalRenderer;
 import components.HealthPack;
@@ -12,6 +13,7 @@ import mapCreator.MapCreator;
 import physics.Collider;
 import physics.Physics;
 import weapon.Grenade;
+import weapon.Rocket;
 
 /**
  * 
@@ -55,8 +57,14 @@ public class Primitives {
 	 * primitive for a crater
 	 */
 	public static final Primitive crater;
-	
+	/**
+	 * primitive for a healthPack
+	 */
 	public static final Primitive healthPack;
+	/**
+	 * primitive for a rocket
+	 */
+	public static final Primitive rocket;
 	
 	static {
 		
@@ -96,6 +104,12 @@ public class Primitives {
 		healthPack.addComponent(HealthPack.class);
 		healthPack.addComponent(Collider.class, Physics.LAYER_WORLD | Physics.RAYCAST_IGNORE, false, true);
 		MapCreator.mapObjects.add(healthPack);
+		
+		rocket = new Primitive(Game.L_WEAPONS);
+		rocket.addComponent(Renderer.class, "rocket");
+		rocket.addComponent(Collider.class, Physics.LAYER_DEFAULT);
+		rocket.addComponent(Damageable.class, 1d);
+		rocket.addComponent(Rocket.class);
 		
 	}
 	

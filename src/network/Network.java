@@ -22,10 +22,6 @@ import gameobject.Gameobject;
 public class Network {
 	
 	/*
-	 * TODO rework networking
-	 */
-	
-	/*
 	 * TODO do not update correct information compare with cloned objects
 	 */
 	
@@ -130,8 +126,7 @@ public class Network {
 	public void updateNet(double deltaTime) {
 		
 		if(isClient()) {
-			new Exception("Clients cannot update objects").printStackTrace();
-			return;
+			throw new RuntimeException("Clients cannot update objects");
 		}
 		
 		for(int i = 0; i < netComponents.size(); i++) {

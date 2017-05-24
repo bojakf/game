@@ -3,11 +3,8 @@ package ui;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.lwjgl.opengl.GL11;
-
 import input.Mouse;
 import input.Mouse.MouseListener;
-import main.Main;
 
 /**
  * 
@@ -82,11 +79,9 @@ public class Ui {
 	 * Render the ui
 	 */
 	public void render() {
-		GL11.glTranslated(0, 0, -Main.zNEAR);
 		for(int i = 0; i < uiObjects.size(); i++) {
 			uiObjects.get(i).render();
 		}
-		GL11.glTranslated(0, 0, Main.zNEAR);
 	}
 	
 	/**

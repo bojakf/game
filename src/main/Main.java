@@ -139,7 +139,7 @@ public class Main {
 		GLFWErrorCallback.createPrint(System.err).set();
 		
 		if(glfwInit() != 1) {
-			new Exception("Error while glfwInit").printStackTrace();
+			throw new RuntimeException("Error while glfwInit");
 		}
 		
 
@@ -162,8 +162,7 @@ public class Main {
 		 */
 		
 		if(window <= 0) {
-			new Exception("Error creating window (window ID:" + window + ")").printStackTrace();
-			System.exit(-1);
+			throw new RuntimeException("Error creating window (window ID:" + window + ")");
 		}
 		
 		//Center window

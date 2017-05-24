@@ -112,8 +112,7 @@ public class Mouse {
 	public static void init(long window) {
 		
 		if(init) {
-			new Exception("Mouse already inited!").printStackTrace();
-			return;
+			throw new RuntimeException("Mouse already inited!");
 		}
 		
 		Mouse.window = window;

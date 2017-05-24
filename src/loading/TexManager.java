@@ -36,8 +36,7 @@ public class TexManager {
 	public static void loadTex(String name, String location) {
 		
 		if(textures.containsKey(name)) {
-			new Exception("Texture Name already used:" + name).printStackTrace();
-			return;
+			throw new RuntimeException("Texture Name already used:" + name);
 		}
 		textures.put(name, TextureLoader.load(location));
 	

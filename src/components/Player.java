@@ -17,12 +17,15 @@ import org.lwjgl.glfw.GLFW;
 
 import gameobject.Gameobject;
 import input.Keyboard;
+import input.Mouse;
+import input.Mouse.MouseListener;
 import main.Game;
 import physics.Vector;
 import rendering.Color;
 import rendering.StringDrawer;
 import weapon.GrenadeLauncher;
 import weapon.Laser;
+import weapon.RocketLauncher;
 import weapon.Weapon;
 
 /**
@@ -32,7 +35,7 @@ import weapon.Weapon;
  * @author jafi2
  *
  */
-public class Player extends Damagable {
+public class Player extends Damageable {
 
 	/**
 	 * 
@@ -63,15 +66,55 @@ public class Player extends Damagable {
 	 * The lives the player has left
 	 */
 	int lives = INITIAL_PLAYER_LIVES;
+	
 	/**
-	 * The weapon the player is currently using
+	 * The list of Weapons for the player
 	 */
-	private Weapon curWeapon;
+	private ArrayList<Weapon> weapons;
+	
+	/**
+	 * The index of the currently selected weapon
+	 */
+	private int selectedWeapon = 0;
+	
+	/**
+	 * Listener for scrolling
+	 */
+	private transient MouseListener mouseListener;
+	
+	/**
+	 * Create the default player component
+	 */
+	public Player() {
+		super(INITIAL_HEALTH);
+	}
 	
 	@Override
 	public void start() {
 		
-		hp = INITIAL_HEALTH;
+		Mouse.addMouseButtonListener(mouseListener = new MouseListener() {
+			
+			@Override
+			public void onScroll(double delta) {
+				selectedWeapon -= (int)delta;
+				while(selectedWeapon < 0) {
+					selectedWeapon = weapons.size() + selectedWeapon;
+				}
+				while(selectedWeapon >= weapons.size()) {
+					selectedWeapon -= weapons.size();
+				}
+			}
+			
+			@Override
+			public void onRelease(int button, int modifiers) {
+				
+			}
+			
+			@Override
+			public void onPress(int button, int modifiers) {
+				
+			}
+		}, playerID);
 		
 		Color wCol = null;
 		if(playerID == 0) {
@@ -84,11 +127,14 @@ public class Player extends Damagable {
 			wCol = new Color(1, 1, 0);
 		}
 		
-		if(playerID == 0) {
-			curWeapon = new GrenadeLauncher(this);
-		} else {
-			curWeapon = new Laser(wCol, this);
-		}
+		weapons = new ArrayList<>();
+		
+		weapons.add(new Laser(wCol, this));
+		weapons.get(0).texName = "laser";
+		weapons.add(new RocketLauncher(this));
+		weapons.get(1).texName = "rocketLauncher";
+		weapons.add(new GrenadeLauncher(this));
+		weapons.get(2).texName = "grenadeLauncher";
 		
 		/*
 		 * Move player to spawnpoint
@@ -110,7 +156,7 @@ public class Player extends Damagable {
 	@Override
 	public void update(double deltaTime) {
 		
-		curWeapon.update(deltaTime);
+		weapons.get(selectedWeapon).update(deltaTime);
 		
 		if(Keyboard.isKeyDown(GLFW.GLFW_KEY_W, playerID)) {
 			parent.velocity.y = 1;
@@ -135,7 +181,7 @@ public class Player extends Damagable {
 	@Override
 	public void render() {
 		
-		curWeapon.render();
+		weapons.get(selectedWeapon).render();
 		
 		glTranslated((parent.pos.x-parent.size.x*0.5) * Game.QUAD_SIZE, parent.pos.y * Game.QUAD_SIZE + parent.size.y*0.5*Game.QUAD_SIZE, 0);
 		
@@ -170,7 +216,7 @@ public class Player extends Damagable {
 
 	@Override
 	protected void onDestroy() {
-		
+		if(mouseListener != null) Mouse.removeMouseButtonListener(mouseListener, playerID);
 	}
 	
 	/**
@@ -219,17 +265,45 @@ public class Player extends Damagable {
 	public Vector getSize() {
 		return parent.size;
 	}
+	
+	/**
+	 * Returns the index of the selected weapon
+	 * @return
+	 */
+	public int getSelectedWeapon() {
+		return selectedWeapon;
+	}
+	
+	/**
+	 * Get the weapon with the specified index
+	 * @param index the index of the weapon
+	 * @return the weapon
+	 */
+	public Weapon getWeapon(int index) {
+		return weapons.get(index);
+	}
+	
+	/**
+	 * Get number of weapons the player has
+	 * @return the number of weapons
+	 */
+	public int getWeaponCount() {
+		return weapons.size();
+	}
+	
 
 	@Override
 	public void sendNetUpdate(ArrayList<Serializable> data) {
 		super.sendNetUpdate(data);
-		curWeapon.sendNetUpdate(data);
+		data.add(selectedWeapon);
+		weapons.get(selectedWeapon).sendNetUpdate(data);
 	}
 
 	@Override
 	public void receiveNetUpdate(ArrayList<Serializable> data) {
 		super.receiveNetUpdate(data);
-		curWeapon.receiveNetUpdate(data);
+		selectedWeapon = (int) data.remove(0);
+		weapons.get(selectedWeapon).receiveNetUpdate(data);
 	}
 
 }

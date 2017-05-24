@@ -17,10 +17,7 @@ import main.Game;
  *
  */
 public abstract class NetComponent extends Component {
-
-	/*
-	 * TODO add final netComponents (map)
-	 */
+	
 	/*
 	 * TODO only send this component to the client
 	 */

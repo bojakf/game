@@ -13,7 +13,7 @@ import main.Game;
  * @author jafi2
  *
  */
-public abstract class Damagable extends NetComponent {
+public class Damageable extends NetComponent {
 
 	/**
 	 * 
@@ -24,6 +24,10 @@ public abstract class Damagable extends NetComponent {
 	 * The health points of the object
 	 */
 	protected double hp;
+	
+	public Damageable(Double hp) {
+		this.hp = hp;
+	}
 	
 	@Override
 	public void start() {
@@ -42,7 +46,6 @@ public abstract class Damagable extends NetComponent {
 		/*
 		 * TODO implement hp bar
 		 */
-		throw new RuntimeException("No live drawing for non players");
 		
 	}
 	
@@ -66,7 +69,7 @@ public abstract class Damagable extends NetComponent {
 			if(parent.hasComponent(Player.class)) {
 			
 				Player p = (Player) parent.getComponent(Player.class);
-				if(p.lives == 0) destroy();
+				if(p.lives == 0) parent.destroy();
 				p.lives--;
 				hp = Player.INITIAL_HEALTH;
 				
@@ -80,7 +83,7 @@ public abstract class Damagable extends NetComponent {
 				}
 				
 			} else {
-				destroy();
+				parent.destroy();
 			}
 			return true;
 			

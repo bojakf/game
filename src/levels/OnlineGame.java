@@ -14,6 +14,8 @@ import map.Map;
 import network.Network;
 import physics.Physics;
 import physics.Vector;
+import ui.Ui;
+import ui.WeaponSelectUi;
 
 /**
  * 
@@ -30,6 +32,11 @@ public class OnlineGame extends Level {
 	private Thread physicsThread;
 	
 	/**
+	 * The ui for the user of this application may be client or server
+	 */
+	private Ui ui;
+	
+	/**
 	 * Join a server
 	 * @param serverAdress the adress of the server
 	 * @param port the port of the server
@@ -39,6 +46,8 @@ public class OnlineGame extends Level {
 		Game.net = Network.connectToServer(serverAdress, port);
 		CameraController.mapSizeX = Game.QUADS_X*2;
 		CameraController.mapSizeY = Game.QUADS_Y*2;
+		
+		init();
 		
 	}
 	
@@ -59,18 +68,32 @@ public class OnlineGame extends Level {
 		((Player)player.getComponent(Player.class)).setPlayerID(0);
 		player.init();
 		
+		init();
+		
+	}
+	
+	private void init() {
+		
+		ui = new Ui();
+		
+		new WeaponSelectUi(ui, Game.net.playerID);
+		
 	}
 	
 	@Override
 	public void update(double deltaTime) {
-		
+		ui.update(deltaTime);
 	}
 
 	@Override
 	public void render() {
+		
 		GL11.glTranslated(-Game.camX*Game.QUAD_SIZE+Game.WORLD_OFFSET_X*Game.QUAD_SIZE, -Game.camY*Game.QUAD_SIZE+Game.WORLD_OFFSET_X*Game.QUAD_SIZE, 0);
 		Physics.drawColliders();
 		GL11.glTranslated(Game.camX*Game.QUAD_SIZE-Game.WORLD_OFFSET_X*Game.QUAD_SIZE, Game.camY*Game.QUAD_SIZE-Game.WORLD_OFFSET_X*Game.QUAD_SIZE, 0);
+	
+		ui.render();
+		
 	}
 
 	@Override

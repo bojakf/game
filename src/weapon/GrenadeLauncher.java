@@ -20,7 +20,7 @@ import ui.Ui;
  * @author jafi2
  *
  */
-public class GrenadeLauncher implements Weapon {
+public class GrenadeLauncher extends Weapon {
 
 	/**
 	 * 
@@ -54,14 +54,14 @@ public class GrenadeLauncher implements Weapon {
 		
 		shotTime += deltaTime;
 		
-		if(shotTime >= RELOAD_TIME && Ui.isMouseButtonDown(0)) {
+		if(shotTime >= RELOAD_TIME && Mouse.isMouseButtonDown(0, player.getPlayerID())) {
 			shotTime = 0;
 			Vector m = Mouse.xy(player.getPlayerID());
 			m.x /= Game.QUAD_SIZE;
 			m.y /= Game.QUAD_SIZE;
 			
 			Vector cam = CameraController.calcCamPos(player);
-			m.x += cam.x-Game.WORLD_OFFSET_Y;
+			m.x += cam.x-Game.WORLD_OFFSET_X;
 			m.y += cam.y-Game.WORLD_OFFSET_Y;
 			
 			Gameobject grenade = Primitives.grenade.create(player.getParent().pos, Grenade.SIZE);

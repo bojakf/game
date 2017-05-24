@@ -5,28 +5,30 @@ import java.util.ArrayList;
 
 /**
  * 
- * This is the interface for all weapons
+ * This is the abstract class for all weapons
  * 
  * @author jafi2
  *
  */
-public interface Weapon extends Serializable {
+public abstract class Weapon implements Serializable {
 
 	/*
 	 * TODO improve this (provide basic functionality) 
 	 */
 	
+	public String texName = null;
+	
 	/**
 	 * Update the weapon
 	 * @param deltaTime time since last update
 	 */
-	public void update(double deltaTime);
+	public abstract void update(double deltaTime);
 	/**
 	 * Render the weapon
 	 */
-	public void render();
+	public abstract void render();
 	
-	public void sendNetUpdate(ArrayList<Serializable> data);
-	public void receiveNetUpdate(ArrayList<Serializable> data);
+	public abstract void sendNetUpdate(ArrayList<Serializable> data);
+	public abstract void receiveNetUpdate(ArrayList<Serializable> data);
 	
 }

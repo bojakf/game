@@ -20,6 +20,9 @@ import physics.Vector;
  */
 public class Map {
 	
+	/*
+	 * TODO option to chose map
+	 */
 	public static String mapName = "test";
 	
 	/**
@@ -57,6 +60,8 @@ public class Map {
 			CameraController.mapSizeY = maxY - minY;
 			CameraController.mapX = minX;
 			CameraController.mapY = minY;
+			
+			in.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();

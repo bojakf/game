@@ -113,7 +113,7 @@ public class Gameobject implements Serializable {
 		if(destroyed) return;
 		
 		for(int i = 0; i < components.size(); i++) {
-			if(components.get(i).isIntialized())components.get(i).render();
+			if(!Game.net.isServer() || components.get(i).isIntialized())components.get(i).render();
 		}
 		
 	}

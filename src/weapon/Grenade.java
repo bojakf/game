@@ -2,7 +2,7 @@ package weapon;
 
 import java.util.ArrayList;
 
-import components.Damagable;
+import components.Damageable;
 import components.Player;
 import gameobject.Component;
 import gameobject.Gameobject;
@@ -100,8 +100,8 @@ public class Grenade extends Component {
 		if(timeLeft <= 0) {
 			ArrayList<Collider> hit = Physics.checkCircle(parent.pos, EXPLOSION_RADIUS);
 			for(int i = 0; i < hit.size(); i++) {
-				if(hit.get(i).getParent().hasComponent(Damagable.class)) {
-					((Damagable)hit.get(i).getParent().getComponent(Damagable.class)).damage(EXPLOSION_DAMAGE);
+				if(hit.get(i).getParent().hasComponent(Damageable.class)) {
+					((Damageable)hit.get(i).getParent().getComponent(Damageable.class)).damage(EXPLOSION_DAMAGE);
 				}
 			}
 			

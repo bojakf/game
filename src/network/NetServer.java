@@ -15,6 +15,7 @@ import components.FinalNetComponent;
 import components.NetComponent;
 import loading.MultiOutStream;
 import main.Game;
+import utility.Mutex;
 
 /**
  * 
@@ -79,6 +80,8 @@ public class NetServer {
 	 * Contains all finalNetComponents queued for removal
 	 */
 	private ArrayList<FinalNetComponent> finalRemoveQueue = new ArrayList<>();
+	
+	private Mutex joinMutex = new Mutex();
 	
 	/**
 	 * Create the server
@@ -192,6 +195,8 @@ public class NetServer {
 					
 					Socket client = serverSocket.accept();
 					
+					joinMutex.P();
+					
 					BufferedOutputStream o = new BufferedOutputStream(client.getOutputStream());
 					ObjectOutputStream out = new ObjectOutputStream(o);
 					ObjectInputStream in = new ObjectInputStream(client.getInputStream());
@@ -221,6 +226,8 @@ public class NetServer {
 					handle.playerID = playerID;
 					handles.add(handle);
 					outAddQueue.add(o);
+					
+					joinMutex.V();
 					
 				
 				} catch (IOException e) {
@@ -275,54 +282,64 @@ public class NetServer {
 				try {
 					
 					/*
-					 * remove objects from client and server
+					 * Sync sending and removing of gameobjects in order to prevent problems with player joining
 					 */
-					while(removeQueue.size() > 0) {
-						NetComponent remove = removeQueue.remove(0);
-						int id = Game.net.netComponents.indexOf(remove);
-						if(id == -1) continue;
-						out.writeByte(NetCommands.REMOVE_OBJECT);
-						out.writeInt(id);
-						out.flush();
-						Game.net.netComponents.remove(remove);
-					}
+					if(joinMutex.PSkip()) {
 					
-					/*
-					 * remove finalNetComponents
-					 */
-					while(finalRemoveQueue.size() > 0) {
-						FinalNetComponent remove = finalRemoveQueue.remove(0);
-						int id = Game.net.finalNetComponents.indexOf(remove);
-						if(id == -1) continue;
-						out.writeByte(NetCommands.REMOVE_FINAL_COMPONENT);
-						out.writeInt(id);
-						out.flush();
-						Game.net.finalNetComponents.remove(id);
-					}
+						/*
+						 * remove objects from client and server
+						 */
+						while(outAddQueue.size() == 0 && removeQueue.size() > 0) {
+							NetComponent remove = removeQueue.remove(0);
+							int id = Game.net.netComponents.indexOf(remove);
+							if(id == -1) continue;
+							out.writeByte(NetCommands.REMOVE_OBJECT);
+							out.writeInt(id);
+							out.flush();
+							Game.net.netComponents.remove(remove);
+						}
+						
+						/*
+						 * remove finalNetComponents
+						 */
+						while(outAddQueue.size() == 0 && finalRemoveQueue.size() > 0) {
+							FinalNetComponent remove = finalRemoveQueue.remove(0);
+							int id = Game.net.finalNetComponents.indexOf(remove);
+							if(id == -1) continue;
+							out.writeByte(NetCommands.REMOVE_FINAL_COMPONENT);
+							out.writeInt(id);
+							out.flush();
+							Game.net.finalNetComponents.remove(id);
+						}
 					
-					/*
-					 * send new objects to client 
-					 */
-					while(sendQueue.size() > 0) {
-						
-						NetComponent obj = sendQueue.remove(0);
-						out.writeByte(NetCommands.ADD_OBJECT);
-						Game.net.netComponents.add(obj);
-						out.writeObject(obj);
-						out.flush();
-						
-					}
 					
-					/*
-					 * Send new finalNetComponents
-					 */
-					while(finalSendQueue.size() > 0) {
+						/*
+						 * send new objects to client 
+						 */
+						while(outAddQueue.size() == 0 && sendQueue.size() > 0) {
+							
+							NetComponent obj = sendQueue.remove(0);
+							out.writeByte(NetCommands.ADD_OBJECT);
+							Game.net.netComponents.add(obj);
+							out.writeObject(obj);
+							out.flush();
+							
+						}
 						
-						FinalNetComponent obj = finalSendQueue.remove(0);
-						out.writeByte(NetCommands.ADD_FINAL_COMPONENT);
-						Game.net.finalNetComponents.add(obj);
-						out.writeObject(obj);
-						out.flush();
+						/*
+						 * Send new finalNetComponents
+						 */
+						while(finalSendQueue.size() > 0) {
+							
+							FinalNetComponent obj = finalSendQueue.remove(0);
+							out.writeByte(NetCommands.ADD_FINAL_COMPONENT);
+							Game.net.finalNetComponents.add(obj);
+							out.writeObject(obj);
+							out.flush();
+							
+						}
+
+						joinMutex.V();
 						
 					}
 					

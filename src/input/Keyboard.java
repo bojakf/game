@@ -71,8 +71,7 @@ public class Keyboard {
 	public static void init(long window) {
 		
 		if(init) {
-			new Exception("Already inited").printStackTrace();
-			return;
+			throw new RuntimeException("Already inited");
 		}
 		
 		Keyboard.window = window;

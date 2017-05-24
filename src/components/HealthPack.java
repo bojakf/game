@@ -49,7 +49,7 @@ public class HealthPack extends Component {
 	public boolean useHealthPack(Player p) {
 		if(!available) return false;
 		if(p.hp >= Player.INITIAL_HEALTH) return false;
-		p.hp = Math.max(p.hp+hpGain, Player.INITIAL_HEALTH);
+		p.hp = Math.min(p.hp+hpGain, Player.INITIAL_HEALTH);
 		available = false;
 		renderer.setTex("reload");
 		return true;

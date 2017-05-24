@@ -86,6 +86,7 @@ public class Physics {
 	/*
 	 * FIXME use force instead of velocity
 	 * TODO add drag
+	 * TODO moving objects collision
 	 */
 	
 	/**

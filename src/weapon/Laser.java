@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL11.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import components.Damagable;
+import components.Damageable;
 import input.Mouse;
 import input.Mouse.MouseListener;
 import main.Game;
@@ -25,8 +25,12 @@ import rendering.Color;
  * @author jafi2
  *
  */
-public class Laser implements Weapon {
+public class Laser extends Weapon {
 
+	/*
+	 * TODO laser reflect on certain objects
+	 */
+	
 	/**
 	 * 
 	 */
@@ -121,8 +125,8 @@ public class Laser implements Weapon {
 			
 			laserStart = origin;
 			if(hit != null) {
-				if(hit.hit.getParent().hasComponent(Damagable.class)) {
-					((Damagable)hit.hit.getParent().getComponent(Damagable.class)).damage(LASER_DPS * deltaTime);
+				if(hit.hit.getParent().hasComponent(Damageable.class)) {
+					((Damageable)hit.hit.getParent().getComponent(Damageable.class)).damage(LASER_DPS * deltaTime);
 				}
 				laserEnd = hit.pos;
 			} else {

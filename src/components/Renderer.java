@@ -115,7 +115,10 @@ public class Renderer extends NetComponent {
 		data.add(parent.size);
 		if(tex != null) {
 			data.add((Integer)tex.curTex);
+		} else {
+			data.add(texName);
 		}
+		data.add(col);
 	}
 
 	@Override
@@ -124,7 +127,10 @@ public class Renderer extends NetComponent {
 		parent.size.set((Vector)data.remove(0));
 		if(tex != null) {
 			 tex.curTex = (int) data.remove(0);
+		} else {
+			texName = (String)data.remove(0);
 		}
+		col = (Color)data.remove(0);
 	}
 
 	public String getTex() {
