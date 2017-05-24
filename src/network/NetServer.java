@@ -265,6 +265,7 @@ public class NetServer {
 					deltaTime = (now-last)/1000000000d;
 				}
 				last = now;
+				
 //				System. out.println(1/deltaTime);
 				/*
 				 * Add new clients to update multiStream
